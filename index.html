@@ -305,15 +305,28 @@
             margin-left: auto;
         }
 
-        /* ─── ICÔNE DE LECTURE (ANGLE DROIT DU BOUTON CLICKABLE) ─── */
-        .read-status-indicator {
+        /* ─── BLOC DE STATUT DE LECTURE (CŒUR ET DATE) ─── */
+        .read-status-container {
             position: absolute;
-            top: 12px;
-            right: 14px;
-            font-size: 15px;
-            opacity: 0.8;
+            top: 14px;
+            right: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
             z-index: 5;
             user-select: none;
+        }
+        .read-status-indicator {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .read-date {
+            font-size: 11px;
+            color: var(--ink-soft);
+            opacity: 0.8;
+            margin-top: 3px;
+            font-style: italic;
+            white-space: nowrap; /* Empêche le texte de se couper sur 2 lignes */
         }
 
         .letter-card {
@@ -325,6 +338,7 @@
             box-shadow: 0 2px 10px var(--shadow);
             overflow: hidden;
             transition: box-shadow 0.2s, transform 0.2s;
+            position: relative; /* Indispensable pour le cœur en absolute */
         }
         .letter-card:hover { box-shadow: 0 6px 20px var(--shadow); transform: translateY(-2px); }
         .letter-card-accent { height: 4px; width: 100%; }
@@ -334,9 +348,11 @@
         .letter-card-body {
             display: flex;
             align-items: center;
-            padding: 16px 18px;
+            /* Padding droit très grand (100px) pour éviter que les textes/boutons n'aillent sous le cœur et la date */
+            padding: 16px 100px 16px 18px;
             gap: 14px;
         }
+        
         .letter-avatar {
             width: 42px; height: 42px;
             border-radius: 50%;
@@ -359,7 +375,6 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            padding-right: 24px; /* Évite la superposition avec le cœur */
         }
         .letter-meta {
             font-size: 13px;
@@ -369,18 +384,22 @@
         }
         .modified-tag { font-style: italic; color: var(--gold); font-size: 12px; }
 
-        .card-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        /* BOUTONS ACTIONS (CRAYON ET POUBELLE) */
+        .card-actions { display: flex; gap: 6px; flex-shrink: 0; }
         .icon-btn {
-            padding: 7px 13px;
+            width: 34px;
+            height: 34px;
             border: none;
-            border-radius: 3px;
-            font-family: 'EB Garamond', serif;
-            font-size: 14px;
+            border-radius: 50%; /* Boutons ronds */
+            font-size: 16px;
             cursor: pointer;
-            transition: opacity 0.15s;
-            width: auto;
+            transition: transform 0.2s, background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
         }
-        .icon-btn:hover { opacity: 0.8; }
+        .icon-btn:hover { transform: scale(1.1); }
         .btn-edit { background: var(--ivory-dk); color: var(--ink); }
         .btn-del  { background: #f5e8e8; color: #8B2020; }
 
@@ -634,13 +653,13 @@
         flowers: { top: "🌸 ✿ 🌼 ✿ 🌸", wm: "🌸", line: "— 🌸 ——— 🌼 ——— 🌸 —" },
         stars:   { top: "✦ ✧ ✨ ✧ ✦", wm: "✨", line: "— ✦ ——— ✧ ——— ✦ —" },
         vintage: { top: "✉ ◆ 🖋 ◆ ✉", wm: "✉", line: "— ✉ ——— ✒ ——— ✉ —" },
-        none:    { top: "", wm: "✦", line: "— ✦ —————————— ✦ —" }
+        none:    { top: "", wm: "✦", line: "— ✦ — Trop aimable — ✦ —" }
     };
 
     function formatDate(ts) {
         if (!ts) return "";
         const d = ts.toDate ? ts.toDate() : new Date(ts);
-        return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
     }
 
     function showStatus(msg, type = 'loading') {
@@ -675,18 +694,31 @@
 
             const isAuthor = currentUser === l.author;
 
-            // Calcul de l'état de lecture : cœur rempli si lu par l'utilisateur connecté, sinon cœur vide
+            // Statut de lecture
             const readBy = l.readBy || [];
-            const isRead = readBy.includes(currentUser);
-            const statusIcon = isRead ? "❤️" : "♡";
-            const statusTitle = isRead ? "Lettre lue" : "Nouvelle lettre non lue !";
+            const recipient = l.author === "Izan" ? "Thalia" : "Izan";
+            const isReadByRecipient = readBy.includes(recipient);
+            
+            const statusIcon = isReadByRecipient ? "❤️" : "♡";
+            const statusTitle = isReadByRecipient ? "Lettre lue par le destinataire" : "Lettre non lue par le destinataire";
+
+            // Format de la date de lecture ("Lu le X à Y")
+            let readDateHtml = "";
+            if (isReadByRecipient && l.readAt) {
+                const readDateText = formatDate(l.readAt);
+                readDateHtml = `<div class="read-date">Lu le ${readDateText}</div>`;
+            }
 
             const card = document.createElement('div');
             card.className = 'letter-card';
-            card.style.position = 'relative'; 
             card.innerHTML = `
                 <div class="letter-card-accent ${isIzan ? 'accent-izan' : 'accent-thalia'}"></div>
-                <div class="read-status-indicator" title="${statusTitle}">${statusIcon}</div>
+                
+                <div class="read-status-container" title="${statusTitle}">
+                    <div class="read-status-indicator">${statusIcon}</div>
+                    ${readDateHtml}
+                </div>
+
                 <div class="letter-card-body">
                     <div class="letter-avatar ${isIzan ? 'avatar-izan' : 'avatar-thalia'}">${initiale}</div>
                     <div class="letter-info" onclick="window._openLetter('${l.id}')">
@@ -697,8 +729,8 @@
                         </p>
                     </div>
                     <div class="card-actions" style="display: ${isAuthor ? 'flex' : 'none'};">
-                        <button class="icon-btn btn-edit" onclick="window._startEdit('${l.id}', event)">Modifier</button>
-                        <button class="icon-btn btn-del"  onclick="window._deleteLetter('${l.id}', event)">Supprimer</button>
+                        <button class="icon-btn btn-edit" title="Modifier cette lettre" onclick="window._startEdit('${l.id}', event)">✏️</button>
+                        <button class="icon-btn btn-del" title="Supprimer cette lettre" onclick="window._deleteLetter('${l.id}', event)">🗑️</button>
                     </div>
                 </div>`;
             list.appendChild(card);
@@ -729,14 +761,14 @@
                     }
                 } else {
                     const dateStr = new Date().toLocaleDateString('fr-FR', { day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'});
-                    letters.unshift({ id: String(Date.now()), title, text, motif, author, date: dateStr, editDate: '', readBy: [currentUser] });
+                    letters.unshift({ id: String(Date.now()), title, text, motif, author, date: dateStr, editDate: '', readBy: [], readAt: null });
                 }
                 localSetAll(letters); renderLetters(localGetAll());
             } else {
                 if (editingId) {
                     await updateDoc(doc(db, "letters", editingId), { title, text, motif, editedAt: serverTimestamp() });
                 } else {
-                    await addDoc(lettersCol, { title, text, motif, author, createdAt: serverTimestamp(), readBy: [currentUser] });
+                    await addDoc(lettersCol, { title, text, motif, author, createdAt: serverTimestamp(), readBy: [], readAt: null });
                 }
             }
             showStatus('Lettre envoyée ! 💌', 'success');
@@ -765,7 +797,7 @@
         document.getElementById('title').value     = '';
         document.getElementById('content').value   = '';
         document.getElementById('motif').value     = 'none';
-        document.getElementById('formTitle').textContent       = '✦ Rédiger un mot doux';
+        document.getElementById('formTitle').textContent       = '✦ Partage tes sentiments ✦';
         document.getElementById('submitBtn').textContent       = 'Sceller & envoyer la lettre';
         document.getElementById('cancelEditBtn').style.display = 'none';
         hideStatus();
@@ -791,19 +823,24 @@
         activeLetter = allLetters.find(x => x.id === id);
         if (!activeLetter) return;
 
-        // Si la personne qui ouvre la lettre n'est pas encore marquée dans la liste des lecteurs
         const readBy = activeLetter.readBy || [];
-        if (!readBy.includes(currentUser)) {
+        
+        // MARQUAGE COMME LU + SAUVEGARDE DE LA DATE/HEURE
+        if (activeLetter.author !== currentUser && !readBy.includes(currentUser)) {
             readBy.push(currentUser);
             if (!usingLocal) {
                 try {
-                    await updateDoc(doc(db, "letters", id), { readBy: readBy });
+                    await updateDoc(doc(db, "letters", id), { 
+                        readBy: readBy,
+                        readAt: serverTimestamp() // Ajout de l'heure exacte de lecture
+                    });
                 } catch(e) { console.error("Erreur marquage lecture:", e); }
             } else {
                 const letters = localGetAll();
                 const idx = letters.findIndex(x => x.id === id);
                 if (idx > -1) {
                     letters[idx].readBy = readBy;
+                    letters[idx].readAt = Date.now();
                     localSetAll(letters);
                     renderLetters(localGetAll());
                 }
