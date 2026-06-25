@@ -487,18 +487,11 @@
             font-family: 'EB Garamond', serif; font-weight: 500;
             position: relative; z-index: 1;
         }
-        .bible-verse-nav {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-top: 10px; position: relative; z-index: 1;
+        .bible-verse-day {
+            display: block; margin-top: 10px; font-size: 11px;
+            color: var(--gold); font-style: italic; font-family: 'EB Garamond', serif;
+            position: relative; z-index: 1;
         }
-        .bible-verse-nav-btn {
-            background: none; border: 1px solid var(--ivory-dk);
-            border-radius: 20px; padding: 4px 12px; cursor: pointer;
-            font-size: 12px; color: var(--ink-soft); font-family: 'EB Garamond', serif;
-            transition: background 0.2s;
-        }
-        .bible-verse-nav-btn:hover { background: var(--rose); border-color: var(--rose-dk); }
-        .bible-verse-counter { font-size: 11px; color: var(--gold); font-style: italic; }
 
         /* ── LETTER SEAL ANIMATION ── */
         @keyframes seal-pulse {
@@ -663,11 +656,7 @@
             <div class="bible-verse-tag" id="bibleVerseTag">❤️ Amour</div>
             <div class="bible-verse-text" id="bibleVerseText"></div>
             <span class="bible-verse-ref" id="bibleVerseRef"></span>
-            <div class="bible-verse-nav">
-                <button class="bible-verse-nav-btn" onclick="prevVerse()">← Précédent</button>
-                <span class="bible-verse-counter" id="bibleVerseCounter"></span>
-                <button class="bible-verse-nav-btn" onclick="nextVerse()">Suivant →</button>
-            </div>
+            <span class="bible-verse-day" id="bibleVerseDay"></span>
         </div>
         <div id="typingIndicator" class="typing-indicator" style="display:none;">
             ✍️ <span id="typingName">Quelqu'un</span> est en train d'écrire<span class="typing-dots">...</span>
@@ -797,7 +786,6 @@
         foi:     { label: "✝️ Foi",      cls: "tag-foi",       color: "#2E7D6E" },
     };
 
-    // Index du verset du jour = basé sur la date, puis navigable manuellement
     let currentVerseIdx = Math.floor(Date.now() / 86400000) % BIBLE_VERSES.length;
 
     function renderVerse() {
@@ -809,17 +797,10 @@
         document.getElementById('bibleVerseCard').style.borderLeftColor = cfg.color;
         document.getElementById('bibleVerseText').textContent = v.text;
         document.getElementById('bibleVerseRef').textContent = '— ' + v.ref;
-        document.getElementById('bibleVerseCounter').textContent =
-            `${currentVerseIdx + 1} / ${BIBLE_VERSES.length}`;
+        const today = new Date();
+        const dayLabel = today.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+        document.getElementById('bibleVerseDay').textContent = '✦ Parole du ' + dayLabel;
     }
-    window.prevVerse = function() {
-        currentVerseIdx = (currentVerseIdx - 1 + BIBLE_VERSES.length) % BIBLE_VERSES.length;
-        renderVerse();
-    };
-    window.nextVerse = function() {
-        currentVerseIdx = (currentVerseIdx + 1) % BIBLE_VERSES.length;
-        renderVerse();
-    };
     renderVerse();
 
     // ── MOTIF SELECTION ──
