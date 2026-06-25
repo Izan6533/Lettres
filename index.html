@@ -130,7 +130,7 @@
             .write-section { position: sticky; top: 20px; }
         }
 
-        /* ── WRITE PANEL ── */
+        /* ── WRITE PANEL & TABS ── */
         .write-section {
             background: var(--paper); border: 1px solid var(--ivory-dk);
             border-radius: 16px; padding: 32px 28px 28px;
@@ -141,14 +141,16 @@
             content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
             background: linear-gradient(to right, var(--bordeaux), var(--gold), var(--thalia));
         }
-        .write-section::after {
-            content: '✦'; position: absolute; top: 12px; right: 20px;
-            color: var(--gold); font-size: 16px; opacity: 0.4;
+        
+        .tab-container { display: flex; border-bottom: 2px solid var(--ivory-dk); margin-bottom: 24px; gap: 10px; }
+        .tab-btn {
+            flex: 1; background: none; border: none; padding: 10px 5px;
+            font-family: 'Cormorant Garamond', serif; font-size: 19px; font-style: italic;
+            color: var(--ink-soft); cursor: pointer; border-bottom: 3px solid transparent;
+            margin-bottom: -2px; transition: 0.3s;
         }
-        .panel-title {
-            font-family: 'Cormorant Garamond', serif; font-size: 22px;
-            color: var(--bordeaux); margin-bottom: 22px; font-style: italic;
-        }
+        .tab-btn.active { color: var(--bordeaux); border-bottom-color: var(--bordeaux); font-weight: 600; }
+
         .field-group { margin-bottom: 16px; }
         .field-group label {
             display: block; font-size: 10px; letter-spacing: 0.22em;
@@ -164,6 +166,10 @@
             border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,169,110,0.15);
         }
         .field-group textarea { height: 150px; resize: vertical; line-height: 1.7; }
+
+        /* ── BIBLE SPECIFIC FIELDS ── */
+        .bible-inputs { display: flex; gap: 10px; }
+        .bible-inputs > div { flex: 1; }
 
         /* ── MOTIF SELECTOR ── */
         .motif-grid {
@@ -225,6 +231,8 @@
             border-radius: 8px; color: var(--ink-soft);
             font-family: 'EB Garamond', serif; font-size: 15px; cursor: pointer;
         }
+        .cancel-btn:hover { background: var(--ivory-dk); }
+
         #statusMsg {
             display: none; padding: 10px 14px; border-radius: 8px;
             font-size: 14px; margin-bottom: 14px;
@@ -326,6 +334,17 @@
         }
         .empty-state::before { content: '💌'; display: block; font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
 
+        /* ── LIGHTBOX (POUR AGRANDIR LES PHOTOS) ── */
+        #lightbox {
+            display: none; position: fixed; inset: 0; background: rgba(20,8,4,0.95);
+            z-index: 3000; justify-content: center; align-items: center;
+            cursor: zoom-out; padding: 20px;
+        }
+        #lightbox img {
+            max-width: 100%; max-height: 100%; border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); object-fit: contain;
+        }
+
         /* ── READER ── */
         #readerView {
             display: none; position: fixed; inset: 0;
@@ -343,10 +362,6 @@
             transition: background 0.2s; color: var(--ink);
         }
         .reader-btn:hover { background: white; }
-        .print-btn {
-            background: var(--bordeaux); color: white;
-        }
-        .print-btn:hover { background: #6B1840; }
 
         /* ── A4 SHEET ── */
         .a4-sheet {
@@ -359,40 +374,21 @@
             border-radius: 4px;
         }
 
-        /* ── MOTIFS VISIBLES ── */
         .a4-sheet .pattern-layer {
             position: absolute; inset: 0; pointer-events: none;
             z-index: 0; border-radius: 4px;
         }
-        /* Motif cœurs */
-        .motif-hearts .pattern-layer {
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='15' y='38' font-size='24' opacity='0.12'%3E%E2%9D%A4%EF%B8%8F%3C/text%3E%3C/svg%3E");
-            background-size: 60px 60px;
-        }
-        /* Motif fleurs */
-        .motif-flowers .pattern-layer {
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='12' y='38' font-size='26' opacity='0.12'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E");
-            background-size: 60px 60px;
-        }
-        /* Motif étoiles */
-        .motif-stars .pattern-layer {
-            background-image: url("data:image/svg+xml,%3Csvg width='55' height='55' viewBox='0 0 55 55' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='10' y='36' font-size='24' opacity='0.13'%3E%E2%9C%A8%3C/text%3E%3C/svg%3E");
-            background-size: 55px 55px;
-        }
-        /* Motif vintage */
-        .motif-vintage .pattern-layer {
-            background-image: url("data:image/svg+xml,%3Csvg width='70' height='70' viewBox='0 0 70 70' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='18' y='42' font-size='26' opacity='0.10'%3E%F0%9F%93%9C%3C/text%3E%3C/svg%3E");
-            background-size: 70px 70px;
-        }
+        .motif-hearts .pattern-layer { background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='15' y='38' font-size='24' opacity='0.12'%3E%E2%9D%A4%EF%B8%8F%3C/text%3E%3C/svg%3E"); background-size: 60px 60px; }
+        .motif-flowers .pattern-layer { background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='12' y='38' font-size='26' opacity='0.12'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E"); background-size: 60px 60px; }
+        .motif-stars .pattern-layer { background-image: url("data:image/svg+xml,%3Csvg width='55' height='55' viewBox='0 0 55 55' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='10' y='36' font-size='24' opacity='0.13'%3E%E2%9C%A8%3C/text%3E%3C/svg%3E"); background-size: 55px 55px; }
+        .motif-vintage .pattern-layer { background-image: url("data:image/svg+xml,%3Csvg width='70' height='70' viewBox='0 0 70 70' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='18' y='42' font-size='26' opacity='0.10'%3E%F0%9F%93%9C%3C/text%3E%3C/svg%3E"); background-size: 70px 70px; }
         .motif-none .pattern-layer { display: none; }
 
-        /* Bordure décorative selon motif */
         .motif-hearts { border: 2px solid rgba(192,57,43,0.15); }
         .motif-flowers { border: 2px solid rgba(212,105,154,0.15); }
         .motif-stars { border: 2px solid rgba(201,169,110,0.18); }
         .motif-vintage { border: 2px solid rgba(44,24,16,0.12); }
 
-        /* Miniature motif dans card */
         .motif-badge {
             display: inline-block; font-size: 13px; margin-left: 6px;
             vertical-align: middle; opacity: 0.7;
@@ -424,18 +420,18 @@
         }
         .sheet-photo {
             border-radius: 6px; overflow: hidden;
-            border: 2px solid var(--ivory-dk); flex-shrink: 0;
+            border: 2px solid var(--ivory-dk); flex-shrink: 0; cursor: zoom-in;
+            transition: 0.2s;
         }
+        .sheet-photo:hover { border-color: var(--gold); filter: brightness(1.05); }
         .sheet-photo img { display: block; width: 180px; height: 140px; object-fit: cover; }
 
-        /* ── WORD COUNTER ── */
         .word-counter {
             text-align: right; font-size: 12px; color: var(--gold);
             margin-top: 4px; font-style: italic; transition: color 0.3s;
         }
         .word-counter.long { color: var(--bordeaux); }
 
-        /* ── CONFETTI ── */
         .confetto {
             position: fixed; pointer-events: none; z-index: 9999;
             width: 8px; height: 8px; border-radius: 2px;
@@ -446,126 +442,59 @@
             100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
         }
 
-        /* ── BIBLE VERSE DU JOUR ── */
         .bible-verse-card {
             background: linear-gradient(145deg, #FFFAF5 0%, #FFF0F5 60%, #FFF8EE 100%);
-            border: 1px solid var(--rose-dk);
-            border-left: 4px solid var(--bordeaux);
-            border-radius: 12px;
-            padding: 18px 20px 14px 22px;
-            margin: 0 0 22px;
+            border: 1px solid var(--rose-dk); border-left: 4px solid var(--bordeaux);
+            border-radius: 12px; padding: 18px 20px 14px 22px; margin: 0 0 22px;
             position: relative; overflow: hidden;
         }
         .bible-verse-card::after {
-            content: '✝';
-            position: absolute; bottom: -10px; right: 14px;
-            font-size: 52px; color: var(--rose-dk);
-            font-family: Georgia, serif; line-height: 1; pointer-events: none;
+            content: '✝'; position: absolute; bottom: -10px; right: 14px;
+            font-size: 52px; color: var(--rose-dk); font-family: Georgia, serif; line-height: 1; pointer-events: none;
         }
         .bible-verse-tag {
             display: inline-flex; align-items: center; gap: 5px;
             font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-            color: white; background: var(--bordeaux);
-            padding: 3px 10px; border-radius: 20px;
+            color: white; background: var(--bordeaux); padding: 3px 10px; border-radius: 20px;
             margin-bottom: 10px; font-family: 'EB Garamond', serif;
         }
         .bible-verse-tag.tag-famille { background: #7B5EA7; }
         .bible-verse-tag.tag-foi { background: #2E7D6E; }
         .bible-verse-text {
             font-family: 'Cormorant Garamond', serif; font-style: italic;
-            font-size: 17px; color: var(--ink); line-height: 1.65;
-            position: relative; z-index: 1;
+            font-size: 17px; color: var(--ink); line-height: 1.65; position: relative; z-index: 1;
         }
         .bible-verse-text::before {
             content: '\201C'; font-size: 38px; color: var(--bordeaux);
-            opacity: 0.25; line-height: 0; vertical-align: -14px;
-            margin-right: 3px; font-family: Georgia, serif;
+            opacity: 0.25; line-height: 0; vertical-align: -14px; margin-right: 3px; font-family: Georgia, serif;
         }
         .bible-verse-ref {
-            display: block; margin-top: 10px; font-size: 12px;
-            color: var(--bordeaux); letter-spacing: 0.08em;
-            font-family: 'EB Garamond', serif; font-weight: 500;
-            position: relative; z-index: 1;
+            display: block; margin-top: 10px; font-size: 12px; color: var(--bordeaux);
+            letter-spacing: 0.08em; font-family: 'EB Garamond', serif; font-weight: 500; position: relative; z-index: 1;
         }
         .bible-verse-day {
-            display: block; margin-top: 10px; font-size: 11px;
-            color: var(--gold); font-style: italic; font-family: 'EB Garamond', serif;
-            position: relative; z-index: 1;
+            display: block; margin-top: 10px; font-size: 11px; color: var(--gold); font-style: italic; font-family: 'EB Garamond', serif; position: relative; z-index: 1;
         }
-
-        /* ── LETTER SEAL ANIMATION ── */
-        @keyframes seal-pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.04); }
-            100% { transform: scale(1); }
-        }
-        .seal-btn:active { animation: seal-pulse 0.3s ease; }
-
-        /* ── NEW LETTER PULSE on card ── */
         @keyframes new-letter-glow {
             0% { box-shadow: 0 0 0 0 rgba(212,105,154,0.5); }
             70% { box-shadow: 0 0 0 12px rgba(212,105,154,0); }
             100% { box-shadow: 0 0 0 0 rgba(212,105,154,0); }
         }
         .letter-card.is-new { animation: new-letter-glow 1.8s ease 3; }
-        @media print {
-            @page { margin: 20mm; size: A4; }
-            html, body { height: auto !important; overflow: visible !important; }
-            body * { visibility: hidden; }
-            #readerView { visibility: visible !important; }
-            #readerView * { visibility: visible !important; }
-            #readerView {
-                position: absolute !important; top: 0; left: 0;
-                width: 100% !important; height: auto !important;
-                background: white !important; backdrop-filter: none !important;
-                padding: 0 !important; overflow: visible !important;
-                display: block !important;
-            }
-            .reader-topbar { display: none !important; }
-            .a4-sheet {
-                box-shadow: none !important;
-                width: 100% !important; max-width: 100% !important;
-                min-height: auto !important;
-                margin: 0 !important; padding: 0 !important;
-                border-radius: 0 !important; border: none !important;
-                /* Crucial: allow natural page breaks */
-                overflow: visible !important;
-                height: auto !important;
-            }
-            /* Pattern layer must repeat across all printed pages */
-            .pattern-layer {
-                position: fixed !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            /* All sheet content must flow naturally */
-            .sheet-meta, .sheet-title, .sheet-content,
-            .sheet-photos, .sheet-footer {
-                position: static !important;
-                overflow: visible !important;
-                page-break-inside: avoid;
-            }
-            .sheet-content {
-                page-break-inside: auto !important;
-                white-space: pre-wrap !important;
-                overflow: visible !important;
-                height: auto !important;
-                max-height: none !important;
-            }
-            .sheet-photo img { max-width: 160px; height: auto; page-break-inside: avoid; }
-            .sheet-photos { page-break-inside: avoid; }
-        }
     </style>
 </head>
 <body>
 
-<!-- Pétales décoratifs -->
 <div class="petal" style="left:5%;animation-duration:18s;animation-delay:0s;">🌸</div>
 <div class="petal" style="left:20%;animation-duration:22s;animation-delay:4s;">✨</div>
 <div class="petal" style="left:40%;animation-duration:16s;animation-delay:8s;">🌸</div>
 <div class="petal" style="left:65%;animation-duration:20s;animation-delay:2s;">💗</div>
 <div class="petal" style="left:80%;animation-duration:25s;animation-delay:6s;">✨</div>
 <div class="petal" style="left:92%;animation-duration:19s;animation-delay:11s;">🌸</div>
+
+<div id="lightbox" onclick="this.style.display='none'">
+    <img id="lightboxImg" src="" alt="Agrandissement">
+</div>
 
 <div id="loginOverlay" style="display:none;">
     <div class="login-box">
@@ -591,66 +520,103 @@
 </header>
 
 <div class="layout">
-    <!-- ── FORMULAIRE ── -->
     <section class="write-section">
-        <h2 class="panel-title" id="formTitle">✦ Partage tes sentiments</h2>
+        
+        <div class="tab-container">
+            <button class="tab-btn active" id="tabLetterBtn" onclick="switchTab('letter')">💌 Nouvelle Lettre</button>
+            <button class="tab-btn" id="tabBibleBtn" onclick="switchTab('bible')">📖 Partager un verset</button>
+        </div>
+
         <div id="statusMsg"></div>
 
-        <div class="field-group">
-            <label>Titre de ton trésor</label>
-            <input type="text" id="title" placeholder="Un doux titre…">
-        </div>
-        <div class="field-group">
-            <label>Ta lettre</label>
-            <textarea id="content" placeholder="Laisse ton cœur parler…" oninput="updateWordCount()"></textarea>
-            <div class="word-counter" id="wordCounter">0 mot</div>
-        </div>
+        <div id="sectionLetter">
+            <div class="field-group">
+                <label>Titre de ton trésor</label>
+                <input type="text" id="title" placeholder="Un doux titre…">
+            </div>
+            <div class="field-group">
+                <label>Ta lettre</label>
+                <textarea id="content" placeholder="Laisse ton cœur parler…" oninput="updateWordCount()"></textarea>
+                <div class="word-counter" id="wordCounter">0 mot</div>
+            </div>
 
-        <!-- MOTIF SELECTOR -->
-        <div class="field-group">
-            <label>Motif décoratif</label>
-            <div class="motif-grid" id="motifGrid">
-                <div class="motif-option selected" data-motif="none" onclick="selectMotif('none', this)">
-                    <span style="font-size:22px;">—</span>
-                    <span>Aucun</span>
-                </div>
-                <div class="motif-option" data-motif="hearts" onclick="selectMotif('hearts', this)">
-                    <div class="motif-preview-bg" style="background-image:url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='5' y='22' font-size='16' opacity='0.4'%3E%E2%9D%A4%3C/text%3E%3C/svg%3E\");background-size:30px;"></div>
-                    ❤️<span>Cœurs</span>
-                </div>
-                <div class="motif-option" data-motif="flowers" onclick="selectMotif('flowers', this)">
-                    <div class="motif-preview-bg" style="background-image:url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='3' y='22' font-size='16' opacity='0.4'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E\");background-size:30px;"></div>
-                    🌸<span>Fleurs</span>
-                </div>
-                <div class="motif-option" data-motif="stars" onclick="selectMotif('stars', this)">
-                    <div class="motif-preview-bg" style="background-image:url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='4' y='22' font-size='16' opacity='0.4'%3E%E2%9C%A8%3C/text%3E%3C/svg%3E\");background-size:30px;"></div>
-                    ✨<span>Étoiles</span>
-                </div>
-                <div class="motif-option" data-motif="vintage" onclick="selectMotif('vintage', this)">
-                    <div class="motif-preview-bg" style="background-image:url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='4' y='22' font-size='14' opacity='0.3'%3E%F0%9F%93%9C%3C/text%3E%3C/svg%3E\");background-size:30px;"></div>
-                    📜<span>Ancien</span>
+            <div class="field-group">
+                <label>Motif décoratif</label>
+                <div class="motif-grid" id="motifGrid">
+                    <div class="motif-option selected" data-motif="none" onclick="selectMotif('none', this)">
+                        <span style="font-size:22px;">—</span><span>Aucun</span>
+                    </div>
+                    <div class="motif-option" data-motif="hearts" onclick="selectMotif('hearts', this)">
+                        <div class="motif-preview-bg" style="background-image:url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='5' y='22' font-size='16' opacity='0.4'%3E%E2%9D%A4%3C/text%3E%3C/svg%3E\");background-size:30px;"></div>
+                        ❤️<span>Cœurs</span>
+                    </div>
+                    <div class="motif-option" data-motif="flowers" onclick="selectMotif('flowers', this)">
+                        <div class="motif-preview-bg" style="background-image:url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='3' y='22' font-size='16' opacity='0.4'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E\");background-size:30px;"></div>
+                        🌸<span>Fleurs</span>
+                    </div>
+                    <div class="motif-option" data-motif="stars" onclick="selectMotif('stars', this)">
+                        <div class="motif-preview-bg" style="background-image:url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='4' y='22' font-size='16' opacity='0.4'%3E%E2%9C%A8%3C/text%3E%3C/svg%3E\");background-size:30px;"></div>
+                        ✨<span>Étoiles</span>
+                    </div>
+                    <div class="motif-option" data-motif="vintage" onclick="selectMotif('vintage', this)">
+                        <div class="motif-preview-bg" style="background-image:url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='4' y='22' font-size='14' opacity='0.3'%3E%F0%9F%93%9C%3C/text%3E%3C/svg%3E\");background-size:30px;"></div>
+                        📜<span>Ancien</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- PHOTOS -->
-        <div class="field-group">
-            <label>Photos (jusqu'à 5)</label>
-            <div class="photo-upload-zone" onclick="document.getElementById('photoInput').click()">
-                <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotos(event)">
-                <div class="photo-upload-icon">📷</div>
-                <div class="photo-upload-text">Cliquer pour ajouter des photos</div>
-                <div class="photo-upload-sub">Galerie, appareil photo ou fichiers</div>
+            <div class="field-group">
+                <label>Photos (jusqu'à 5)</label>
+                <div class="photo-upload-zone" onclick="document.getElementById('photoInput').click()">
+                    <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotos(event)">
+                    <div class="photo-upload-icon">📷</div>
+                    <div class="photo-upload-text">Cliquer pour ajouter des photos</div>
+                    <div class="photo-upload-sub">Galerie, appareil photo ou fichiers</div>
+                </div>
+                <div class="photos-preview" id="photosPreview"></div>
+                <div class="photos-count" id="photosCount"></div>
             </div>
-            <div class="photos-preview" id="photosPreview"></div>
-            <div class="photos-count" id="photosCount"></div>
+
+            <button class="seal-btn" id="submitBtn" onclick="saveLetter()">Sceller &amp; envoyer la lettre</button>
+            <button class="cancel-btn" id="cancelEditBtn" onclick="resetForm()" style="display:none;">Annuler la modification</button>
         </div>
 
-        <button class="seal-btn" id="submitBtn" onclick="saveLetter()">Sceller &amp; envoyer la lettre</button>
-        <button class="cancel-btn" id="cancelEditBtn" onclick="resetForm()" style="display:none;">Annuler la modification</button>
+        <div id="sectionBible" style="display:none;">
+            <div class="field-group">
+                <label>Livre de la Bible</label>
+                <select id="bibleBook"></select>
+            </div>
+            <div class="bible-inputs">
+                <div>
+                    <label>Chapitre</label>
+                    <input type="number" id="bibleChap" min="1" value="1">
+                </div>
+                <div>
+                    <label>Du verset</label>
+                    <input type="number" id="bibleVStart" min="1" value="1">
+                </div>
+                <div>
+                    <label>Au verset (optionnel)</label>
+                    <input type="number" id="bibleVEnd" min="1" placeholder="Ex: 5">
+                </div>
+            </div>
+            
+            <button class="cancel-btn" style="margin: 10px 0 20px;" onclick="fetchVerse()">🔍 Chercher le verset</button>
+            
+            <div class="field-group">
+                <label>Texte du verset</label>
+                <textarea id="bibleText" readonly placeholder="Clique sur 'Chercher le verset' pour l'afficher..." style="height:110px; background:#f5f2ea;"></textarea>
+            </div>
+            <div class="field-group">
+                <label>Ton commentaire (optionnel)</label>
+                <textarea id="bibleComment" placeholder="Ajoute un petit mot doux ou ce que ce verset t'inspire..." style="height:90px;"></textarea>
+            </div>
+            
+            <button class="seal-btn" id="submitBibleBtn" onclick="saveBibleLetter()">Sceller & envoyer ce verset</button>
+        </div>
+
     </section>
 
-    <!-- ── LISTE ── -->
     <section class="history-section">
         <div id="bibleVerseCard" class="bible-verse-card">
             <div class="bible-verse-tag" id="bibleVerseTag">❤️ Amour</div>
@@ -669,7 +635,6 @@
     </section>
 </div>
 
-<!-- ── READER ── -->
 <div id="readerView">
     <div class="reader-topbar">
         <button class="reader-btn" onclick="closeLetter()">⬅️ Retour</button>
@@ -710,12 +675,171 @@
         const app = initializeApp(FIREBASE_CONFIG);
         db = getFirestore(app);
         lettersCol = collection(db, "letters");
-        photosCol  = collection(db, "photos");   // collection séparée pour les photos
+        photosCol  = collection(db, "photos");
         statusDoc  = doc(db, "status", "typing");
     } catch(e) {
         console.error('Firebase init échoué :', e);
         usingLocal = true;
     }
+
+    // ── LIGHTBOX (PHOTOS PLEIN ECRAN) ──
+    window.openLightbox = function(src) {
+        document.getElementById('lightboxImg').src = src;
+        document.getElementById('lightbox').style.display = 'flex';
+    };
+
+    // ── GESTION DES ONGLETS (LETTRE vs BIBLE) ──
+    window.switchTab = function(tabName) {
+        const secLetter = document.getElementById('sectionLetter');
+        const secBible = document.getElementById('sectionBible');
+        const btnLetter = document.getElementById('tabLetterBtn');
+        const btnBible = document.getElementById('tabBibleBtn');
+
+        if(tabName === 'letter') {
+            secLetter.style.display = 'block';
+            secBible.style.display = 'none';
+            btnLetter.classList.add('active');
+            btnBible.classList.remove('active');
+        } else {
+            secLetter.style.display = 'none';
+            secBible.style.display = 'block';
+            btnLetter.classList.remove('active');
+            btnBible.classList.add('active');
+        }
+    };
+
+    // ── BIBLE LISTE DES LIVRES ──
+    const BIBLE_BOOKS = [
+        { fr: "Genèse", en: "Genesis" }, { fr: "Exode", en: "Exodus" }, { fr: "Lévitique", en: "Leviticus" },
+        { fr: "Nombres", en: "Numbers" }, { fr: "Deutéronome", en: "Deuteronomy" }, { fr: "Josué", en: "Joshua" },
+        { fr: "Juges", en: "Judges" }, { fr: "Ruth", en: "Ruth" }, { fr: "1 Samuel", en: "1 Samuel" },
+        { fr: "2 Samuel", en: "2 Samuel" }, { fr: "1 Rois", en: "1 Kings" }, { fr: "2 Rois", en: "2 Kings" },
+        { fr: "1 Chroniques", en: "1 Chronicles" }, { fr: "2 Chroniques", en: "2 Chronicles" }, { fr: "Esdras", en: "Ezra" },
+        { fr: "Néhémie", en: "Nehemiah" }, { fr: "Esther", en: "Esther" }, { fr: "Job", en: "Job" },
+        { fr: "Psaumes", en: "Psalms" }, { fr: "Proverbes", en: "Proverbs" }, { fr: "Ecclésiaste", en: "Ecclesiastes" },
+        { fr: "Cantique des Cantiques", en: "Song of Solomon" }, { fr: "Ésaïe", en: "Isaiah" }, { fr: "Jérémie", en: "Jeremiah" },
+        { fr: "Lamentations", en: "Lamentations" }, { fr: "Ézéchiel", en: "Ezekiel" }, { fr: "Daniel", en: "Daniel" },
+        { fr: "Osée", en: "Hosea" }, { fr: "Joël", en: "Joel" }, { fr: "Amos", en: "Amos" },
+        { fr: "Abdias", en: "Obadiah" }, { fr: "Jonas", en: "Jonah" }, { fr: "Michée", en: "Micah" },
+        { fr: "Nahum", en: "Nahum" }, { fr: "Habacuc", en: "Habakkuk" }, { fr: "Sophonie", en: "Zephaniah" },
+        { fr: "Aggée", en: "Haggai" }, { fr: "Zacharie", en: "Zechariah" }, { fr: "Malachie", en: "Malachi" },
+        { fr: "Matthieu", en: "Matthew" }, { fr: "Marc", en: "Mark" }, { fr: "Luc", en: "Luke" },
+        { fr: "Jean", en: "John" }, { fr: "Actes", en: "Acts" }, { fr: "Romains", en: "Romans" },
+        { fr: "1 Corinthiens", en: "1 Corinthians" }, { fr: "2 Corinthiens", en: "2 Corinthians" },
+        { fr: "Galates", en: "Galatians" }, { fr: "Éphésiens", en: "Ephesians" }, { fr: "Philippiens", en: "Philippians" },
+        { fr: "Colossiens", en: "Colossians" }, { fr: "1 Thessaloniciens", en: "1 Thessalonians" },
+        { fr: "2 Thessaloniciens", en: "2 Thessalonians" }, { fr: "1 Timothée", en: "1 Timothy" },
+        { fr: "2 Timothée", en: "2 Timothy" }, { fr: "Tite", en: "Titus" }, { fr: "Philémon", en: "Philemon" },
+        { fr: "Hébreux", en: "Hebrews" }, { fr: "Jacques", en: "James" }, { fr: "1 Pierre", en: "1 Peter" },
+        { fr: "2 Pierre", en: "2 Peter" }, { fr: "1 Jean", en: "1 John" }, { fr: "2 Jean", en: "2 John" },
+        { fr: "3 Jean", en: "3 John" }, { fr: "Jude", en: "Jude" }, { fr: "Apocalypse", en: "Revelation" }
+    ];
+
+    function populateBibleBooks() {
+        const select = document.getElementById('bibleBook');
+        BIBLE_BOOKS.forEach(b => {
+            let opt = document.createElement('option');
+            opt.value = b.en;
+            opt.textContent = b.fr;
+            select.appendChild(opt);
+        });
+    }
+    populateBibleBooks();
+
+    window.fetchVerse = async function() {
+        const bookEn = document.getElementById('bibleBook').value;
+        const chap = document.getElementById('bibleChap').value;
+        const vStart = document.getElementById('bibleVStart').value;
+        const vEnd = document.getElementById('bibleVEnd').value;
+        
+        if(!chap || !vStart) return alert("Il faut au moins le chapitre et le premier verset !");
+        
+        let ref = `${bookEn} ${chap}:${vStart}`;
+        if(vEnd && parseInt(vEnd) > parseInt(vStart)) ref += `-${vEnd}`;
+        
+        document.getElementById('bibleText').value = "Recherche en cours... ⏳";
+        
+        try {
+            const res = await fetch(`https://bible-api.com/${ref}?translation=french`);
+            if(!res.ok) throw new Error("Verset introuvable");
+            const data = await res.json();
+            document.getElementById('bibleText').value = data.text.trim();
+        } catch(e) {
+            document.getElementById('bibleText').value = "Impossible de trouver ce verset. Vérifie les numéros.";
+        }
+    };
+
+    function checkBibleLimit() {
+        let today = new Date().toLocaleDateString('fr-FR');
+        let data = JSON.parse(localStorage.getItem('bible_limit_' + currentUser) || '{"date":"","count":0}');
+        if (data.date !== today) { data = { date: today, count: 0 }; }
+        return data;
+    }
+    function incrementBibleLimit() {
+        let data = checkBibleLimit();
+        data.count++;
+        localStorage.setItem('bible_limit_' + currentUser, JSON.stringify(data));
+    }
+
+    window.saveBibleLetter = async function() {
+        if(usingLocal) return alert("Veuillez connecter Firebase.");
+
+        const limitData = checkBibleLimit();
+        if(limitData.count >= 3) {
+            alert("Tu as atteint ta limite de 3 versets partagés pour aujourd'hui ! ✨");
+            return;
+        }
+
+        const bookEn = document.getElementById('bibleBook').value;
+        const bookFr = BIBLE_BOOKS.find(b => b.en === bookEn).fr;
+        const chap = document.getElementById('bibleChap').value;
+        const vStart = document.getElementById('bibleVStart').value;
+        const vEnd = document.getElementById('bibleVEnd').value;
+        const text = document.getElementById('bibleText').value.trim();
+        const comment = document.getElementById('bibleComment').value.trim();
+
+        if(!text || text.includes("Impossible") || text.includes("Recherche")) {
+            alert("Cherche d'abord un verset valide avant de l'envoyer !");
+            return;
+        }
+
+        let refStr = `${bookFr} ${chap}:${vStart}`;
+        if(vEnd && parseInt(vEnd) > parseInt(vStart)) refStr += `-${vEnd}`;
+
+        const letterTitle = `📖 ${refStr}`;
+        const letterContent = `« ${text} »\n\n${comment}`;
+
+        const btn = document.getElementById('submitBibleBtn');
+        btn.disabled = true;
+        btn.textContent = "Envoi...";
+
+        try {
+            await addDoc(lettersCol, {
+                title: letterTitle,
+                text: letterContent,
+                motif: 'vintage',
+                hasPhotos: false,
+                photoCount: 0,
+                author: currentUser,
+                createdAt: serverTimestamp(),
+                readBy: [], readAt: null, reactions: {},
+                isBible: true
+            });
+            incrementBibleLimit();
+            document.getElementById('bibleText').value = '';
+            document.getElementById('bibleComment').value = '';
+            document.getElementById('bibleChap').value = '1';
+            document.getElementById('bibleVStart').value = '1';
+            document.getElementById('bibleVEnd').value = '';
+            launchConfetti();
+            switchTab('letter');
+        } catch(e) {
+            console.error(e); alert("Erreur d'envoi.");
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Sceller & envoyer ce verset";
+        }
+    };
 
     // ── WORD COUNTER ──
     window.updateWordCount = function() {
@@ -749,7 +873,6 @@
 
     // ── VERSETS BIBLIQUES DU JOUR ──
     const BIBLE_VERSES = [
-        // ❤️ AMOUR
         { text: "Car Dieu a tant aimé le monde qu'il a donné son Fils unique, afin que quiconque croit en lui ne périsse point, mais qu'il ait la vie éternelle.", ref: "Jean 3:16", theme: "amour" },
         { text: "L'amour est patient, l'amour est serviable, il n'est pas envieux, il ne se vante pas, il ne s'enfle pas d'orgueil.", ref: "1 Corinthiens 13:4", theme: "amour" },
         { text: "Bien-aimés, aimons-nous les uns les autres, car l'amour vient de Dieu, et quiconque aime est né de Dieu et connaît Dieu.", ref: "1 Jean 4:7", theme: "amour" },
@@ -760,7 +883,6 @@
         { text: "Aimez-vous les uns les autres d'un amour fraternel ; rivalisez d'estime réciproque.", ref: "Romains 12:10", theme: "amour" },
         { text: "Par-dessus tout cela, revêtez-vous de la charité, qui est le lien de la perfection.", ref: "Colossiens 3:14", theme: "amour" },
         { text: "L'amour ne fait point de mal au prochain : l'amour est donc l'accomplissement de la loi.", ref: "Romains 13:10", theme: "amour" },
-        // 🏠 FAMILLE
         { text: "Honore ton père et ta mère, afin que tes jours soient prolongés sur la terre que l'Éternel, ton Dieu, te donne.", ref: "Exode 20:12", theme: "famille" },
         { text: "La maison et les richesses sont un héritage des pères, mais une femme prudente est un don de l'Éternel.", ref: "Proverbes 19:14", theme: "famille" },
         { text: "Quant à moi et à ma maison, nous servirons l'Éternel.", ref: "Josué 24:15", theme: "famille" },
@@ -771,17 +893,16 @@
         { text: "La femme vertueuse est la couronne de son mari.", ref: "Proverbes 12:4", theme: "famille" },
         { text: "Instructe l'enfant selon la voie qu'il doit suivre ; et quand il sera vieux, il ne s'en détournera pas.", ref: "Proverbes 22:6", theme: "famille" },
         { text: "Deux valent mieux qu'un, parce qu'ils retirent un bon salaire de leur travail.", ref: "Ecclésiaste 4:9", theme: "famille" },
-        // ✝️ FOI
         { text: "Je puis tout par celui qui me fortifie.", ref: "Philippiens 4:13", theme: "foi" },
         { text: "Confie-toi en l'Éternel de tout ton cœur, et ne t'appuie pas sur ta sagesse ; reconnais-le dans toutes tes voies, et il aplanira tes sentiers.", ref: "Proverbes 3:5-6", theme: "foi" },
         { text: "Car je connais les projets que j'ai formés sur vous, dit l'Éternel, projets de paix et non de malheur, afin de vous donner un avenir et de l'espérance.", ref: "Jérémie 29:11", theme: "foi" },
         { text: "L'Éternel est mon berger : je ne manquerai de rien.", ref: "Psaumes 23:1", theme: "foi" },
         { text: "Cherchez premièrement le royaume et la justice de Dieu ; et toutes ces choses vous seront données par-dessus.", ref: "Matthieu 6:33", theme: "foi" },
         { text: "Ne crains rien, car je suis avec toi ; ne promène pas des regards inquiets, car je suis ton Dieu.", ref: "Ésaïe 41:10", theme: "foi" },
-        { text: "La foi est une ferme assurance des choses qu'on espère, une démonstration de celles qu'on ne voit pas.", ref: "Hébreux 11:1", theme: "foi" },
+        { text: "La faith est une ferme assurance des choses qu'on espère, une démonstration de celles qu'on ne voit pas.", ref: "Hébreux 11:1", theme: "foi" },
         { text: "Remets ton sort à l'Éternel, mets en lui ta confiance, et il agira.", ref: "Psaumes 37:5", theme: "foi" },
         { text: "Heureux ceux qui ont le cœur pur, car ils verront Dieu.", ref: "Matthieu 5:8", theme: "foi" },
-        { text: "Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos.", ref: "Matthieu 11:28", theme: "foi" },
+        { text: "Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos.", ref: "Matthieu 11:28", theme: "foi" }
     ];
 
     const THEME_CONFIG = {
@@ -842,7 +963,6 @@
             preview.appendChild(thumb);
         });
         count.textContent = uploadedPhotos.length > 0 ? `${uploadedPhotos.length}/5 photo${uploadedPhotos.length>1?'s':''}` : '';
-        // Update upload zone hint
         const zone = document.querySelector('.photo-upload-sub');
         if (uploadedPhotos.length >= 5) zone.textContent = 'Maximum atteint (5/5)';
         else zone.textContent = `Galerie, appareil photo ou fichiers · ${5-uploadedPhotos.length} restante${5-uploadedPhotos.length>1?'s':''}`;
@@ -888,7 +1008,7 @@
 
     // ── TYPING INDICATOR ──
     let typingTimeout;
-    [document.getElementById('title'), document.getElementById('content')].forEach(el => {
+    [document.getElementById('title'), document.getElementById('content'), document.getElementById('bibleComment')].forEach(el => {
         el.addEventListener('input', () => {
             if (!usingLocal && currentUser) {
                 setDoc(statusDoc, { [currentUser]: Date.now() }, { merge: true });
@@ -922,11 +1042,9 @@
         if (usingLocal) return;
         const l = allLetters.find(x => x.id === letterId);
         if (!l) return;
-        // Cannot react to own letters
         if (l.author === currentUser) return;
 
         let reactions = { ...(l.reactions || {}) };
-        // Toggle: if same emoji already selected, remove it
         if (reactions[currentUser] === emoji) {
             delete reactions[currentUser];
         } else {
@@ -971,7 +1089,6 @@
             const motifEmoji = MOTIF_EMOJI[motif] ? `<span class="motif-badge">${MOTIF_EMOJI[motif]}</span>` : '';
 
             const reactions = l.reactions || {};
-            // Group reactions by emoji
             const emojiGroups = {};
             for (const [user, emoji] of Object.entries(reactions)) {
                 emojiGroups[emoji] = (emojiGroups[emoji] || []);
@@ -1023,7 +1140,6 @@
     }
 
     // ── COMPRESSION IMAGE ──
-    // Réduit agressivement : max 900px, qualité 0.65 → ~50-150 KB par photo
     function compressImage(dataUrl, maxWidth = 900, quality = 0.65) {
         return new Promise(resolve => {
             const img = new Image();
@@ -1039,12 +1155,8 @@
         });
     }
 
-    // ── PHOTOS : stockées dans une collection séparée "photos" ──
-    // Chaque doc photos/{letterId} contient { data: ["base64...", ...] }
-    // Ainsi la lettre principale reste légère (<1MB)
     async function savePhotos(letterId, photos) {
         if (!photos.length) {
-            // Supprimer les anciennes photos si on vide
             try { await deleteDoc(doc(photosCol, letterId)); } catch(_) {}
             return;
         }
@@ -1119,16 +1231,26 @@
         const l = allLetters.find(x => x.id === id);
         if (!l || l.author !== currentUser) return;
         editingId = l.id;
+        
+        switchTab('letter');
+        
         document.getElementById('title').value = l.title;
         document.getElementById('content').value = l.text;
         selectedMotif = l.motif || 'none';
-        // Update motif UI
         document.querySelectorAll('.motif-option').forEach(o => {
             o.classList.toggle('selected', o.dataset.motif === selectedMotif);
         });
-        // Load photos — les URLs Storage sont gardées telles quelles
-        uploadedPhotos = (l.photos || []).map((url, i) => ({ dataUrl: url, name: `photo_${i}` }));
-        renderPhotoPreviews();
+        
+        if (l.hasPhotos) {
+            loadPhotos(l.id).then(urls => {
+                uploadedPhotos = urls.map((url, i) => ({ dataUrl: url, name: `photo_${i}` }));
+                renderPhotoPreviews();
+            });
+        } else {
+            uploadedPhotos = [];
+            renderPhotoPreviews();
+        }
+        
         document.getElementById('cancelEditBtn').style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -1150,6 +1272,7 @@
         if (!l || l.author !== currentUser) return;
         if (confirm('Effacer définitivement cette lettre ?')) {
             await deleteDoc(doc(db, "letters", id));
+            await deleteDoc(doc(photosCol, id)); // Clean up photos
             if (editingId === id) resetForm();
         }
     };
@@ -1158,7 +1281,6 @@
         activeLetter = allLetters.find(x => x.id === id);
         if (!activeLetter) return;
 
-        // Mark as read
         const readBy = activeLetter.readBy || [];
         if (activeLetter.author !== currentUser && !readBy.includes(currentUser)) {
             readBy.push(currentUser);
@@ -1176,15 +1298,17 @@
         document.getElementById('sheetContent').textContent = activeLetter.text;
         document.getElementById('sheetFooter').textContent = `— ${activeLetter.author} ✦`;
 
-        // Photos
         const photosEl = document.getElementById('sheetPhotos');
         photosEl.innerHTML = '';
-        (activeLetter.photos || []).forEach(dataUrl => {
-            const div = document.createElement('div');
-            div.className = 'sheet-photo';
-            div.innerHTML = `<img src="${dataUrl}" alt="photo">`;
-            photosEl.appendChild(div);
-        });
+        if (activeLetter.hasPhotos) {
+            const urls = await loadPhotos(id);
+            urls.forEach(dataUrl => {
+                const div = document.createElement('div');
+                div.className = 'sheet-photo';
+                div.innerHTML = `<img src="${dataUrl}" alt="photo" onclick="openLightbox(this.src)">`;
+                photosEl.appendChild(div);
+            });
+        }
 
         document.getElementById('readerView').style.display = 'block';
         document.body.style.overflow = 'hidden';
@@ -1196,7 +1320,6 @@
     };
 
     function initFirebaseListener() {
-        // Affiche un état de chargement clair
         document.getElementById('lettersList').innerHTML =
             `<div class="empty-state" style="opacity:0.5;font-size:16px;">⏳ Chargement des lettres…</div>`;
 
@@ -1215,7 +1338,6 @@
                     renderLetters(letters);
                 },
                 (err) => {
-                    // Erreur Firestore (règles, réseau…) — affichée clairement
                     console.error('Firestore listener error:', err);
                     document.getElementById('lettersList').innerHTML =
                         `<div class="empty-state" style="color:#C0392B;opacity:1;font-size:15px;">
