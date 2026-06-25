@@ -225,6 +225,16 @@
         }
         .seal-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,34,82,0.35); }
         .seal-btn::after { content: ' 💌'; }
+        
+        .search-btn {
+            width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--gold), #A68A56);
+            color: white; border: none; border-radius: 10px;
+            font-family: 'Cormorant Garamond', serif; font-size: 19px;
+            font-style: italic; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .search-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,169,110,0.35); }
+
         .cancel-btn {
             width: 100%; padding: 9px; margin-top: 8px;
             background: transparent; border: 1px solid var(--ivory-dk);
@@ -601,7 +611,7 @@
                 </div>
             </div>
             
-            <button class="cancel-btn" style="margin: 10px 0 20px;" onclick="fetchVerse()">🔍 Chercher le verset</button>
+            <button class="search-btn" onclick="fetchVerse()">🔍 Chercher le verset</button>
             
             <div class="field-group">
                 <label>Texte du verset</label>
@@ -748,22 +758,38 @@
 
     window.fetchVerse = async function() {
         const bookEn = document.getElementById('bibleBook').value;
-        const chap = document.getElementById('bibleChap').value;
-        const vStart = document.getElementById('bibleVStart').value;
-        const vEnd = document.getElementById('bibleVEnd').value;
+        const chap = parseInt(document.getElementById('bibleChap').value);
+        const vStart = parseInt(document.getElementById('bibleVStart').value);
+        const vEndInput = document.getElementById('bibleVEnd').value;
         
         if(!chap || !vStart) return alert("Il faut au moins le chapitre et le premier verset !");
         
         let ref = `${bookEn} ${chap}:${vStart}`;
-        if(vEnd && parseInt(vEnd) > parseInt(vStart)) ref += `-${vEnd}`;
+        
+        // Vérification de sécurité pour le verset de fin
+        if(vEndInput) {
+            const vEnd = parseInt(vEndInput);
+            if(vEnd <= vStart) {
+                alert("Le verset de fin doit être plus grand que le verset de début !");
+                return;
+            }
+            ref += `-${vEnd}`;
+        }
         
         document.getElementById('bibleText').value = "Recherche en cours... ⏳";
         
         try {
-            const res = await fetch(`https://bible-api.com/${ref}?translation=french`);
+            // Sécurise le format de l'URL pour éviter l'erreur "Verset introuvable"
+            const url = `https://bible-api.com/${encodeURIComponent(ref)}?translation=french`;
+            const res = await fetch(url);
             if(!res.ok) throw new Error("Verset introuvable");
+            
             const data = await res.json();
-            document.getElementById('bibleText').value = data.text.trim();
+            if(data.text) {
+                document.getElementById('bibleText').value = data.text.trim();
+            } else {
+                throw new Error("Texte vide");
+            }
         } catch(e) {
             document.getElementById('bibleText').value = "Impossible de trouver ce verset. Vérifie les numéros.";
         }
