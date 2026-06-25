@@ -687,8 +687,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+    import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, setDoc, getDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const FIREBASE_CONFIG = {
         apiKey:            "AIzaSyDe3z2Al2lFQjTXpjvNGjKZdb68sc1DJl4",
@@ -699,30 +698,20 @@
         appId:             "1:1054625595553:web:eeed9b8c62d96259acf0e0"
     };
 
-    let db, storage, lettersCol, statusDoc;
+    let db, lettersCol, photosCol, statusDoc;
     let usingLocal = false;
-    let storageAvailable = false;
     let currentUser = localStorage.getItem('letter_user') || null;
     let isInitialLoad = true;
     let editingId = null, activeLetter = null, allLetters = [];
     let selectedMotif = 'none';
     let uploadedPhotos = [];
 
-    // Initialisation Firestore — séparée de Storage pour éviter qu'une erreur Storage
-    // ne bloque tout le reste
     try {
         const app = initializeApp(FIREBASE_CONFIG);
         db = getFirestore(app);
         lettersCol = collection(db, "letters");
-        statusDoc = doc(db, "status", "typing");
-
-        // Storage est optionnel : si ça plante, les lettres sans photo marchent quand même
-        try {
-            storage = getStorage(app);
-            storageAvailable = true;
-        } catch(se) {
-            console.warn('Firebase Storage non disponible — photos désactivées', se);
-        }
+        photosCol  = collection(db, "photos");   // collection séparée pour les photos
+        statusDoc  = doc(db, "status", "typing");
     } catch(e) {
         console.error('Firebase init échoué :', e);
         usingLocal = true;
@@ -1033,8 +1022,9 @@
         });
     }
 
-    // ── COMPRESS IMAGE before upload ──
-    function compressImage(dataUrl, maxWidth = 1200, quality = 0.82) {
+    // ── COMPRESSION IMAGE ──
+    // Réduit agressivement : max 900px, qualité 0.65 → ~50-150 KB par photo
+    function compressImage(dataUrl, maxWidth = 900, quality = 0.65) {
         return new Promise(resolve => {
             const img = new Image();
             img.onload = () => {
@@ -1043,76 +1033,71 @@
                 if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
                 canvas.width = w; canvas.height = h;
                 canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                canvas.toBlob(blob => resolve(blob), 'image/jpeg', quality);
+                resolve(canvas.toDataURL('image/jpeg', quality));
             };
             img.src = dataUrl;
         });
     }
 
-    // ── UPLOAD PHOTOS TO STORAGE ──
-    async function uploadPhotos(letterId) {
-        const urls = [];
-        for (let i = 0; i < uploadedPhotos.length; i++) {
-            const ph = uploadedPhotos[i];
-            // Déjà une URL http (photo existante depuis Storage) → garder telle quelle
-            if (ph.dataUrl.startsWith('http')) {
-                urls.push(ph.dataUrl);
-                continue;
-            }
-            // Storage disponible → upload compressé
-            if (storageAvailable) {
-                try {
-                    const blob = await compressImage(ph.dataUrl);
-                    const storageRef = ref(storage, `letters/${letterId}/photo_${Date.now()}_${i}.jpg`);
-                    await uploadBytes(storageRef, blob);
-                    const url = await getDownloadURL(storageRef);
-                    urls.push(url);
-                    continue;
-                } catch(e) {
-                    console.warn('Upload Storage échoué, fallback base64 compressé :', e);
-                }
-            }
-            // Fallback : base64 compressé (si Storage indispo ou erreur)
-            const blob = await compressImage(ph.dataUrl, 800, 0.7);
-            const reader = new FileReader();
-            const b64 = await new Promise(res => { reader.onload = e => res(e.target.result); reader.readAsDataURL(blob); });
-            urls.push(b64);
+    // ── PHOTOS : stockées dans une collection séparée "photos" ──
+    // Chaque doc photos/{letterId} contient { data: ["base64...", ...] }
+    // Ainsi la lettre principale reste légère (<1MB)
+    async function savePhotos(letterId, photos) {
+        if (!photos.length) {
+            // Supprimer les anciennes photos si on vide
+            try { await deleteDoc(doc(photosCol, letterId)); } catch(_) {}
+            return;
         }
-        return urls;
+        const compressed = await Promise.all(
+            photos.map(p => p.startsWith('data:') ? compressImage(p) : Promise.resolve(p))
+        );
+        await setDoc(doc(photosCol, letterId), { data: compressed });
+    }
+
+    async function loadPhotos(letterId) {
+        try {
+            const snap = await getDoc(doc(photosCol, letterId));
+            return snap.exists() ? (snap.data().data || []) : [];
+        } catch(_) { return []; }
     }
 
     // ── SAVE ──
     window.saveLetter = async function() {
         const title = document.getElementById('title').value.trim();
-        const text = document.getElementById('content').value.trim();
+        const text  = document.getElementById('content').value.trim();
         if (!title || !text) return;
+
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true;
-
-        // Progress feedback selon nb photos
-        const hasPhotos = uploadedPhotos.some(p => !p.dataUrl.startsWith('http'));
-        submitBtn.textContent = hasPhotos ? 'Compression des photos…' : 'Envoi en cours…';
+        const hasNewPhotos = uploadedPhotos.some(p => p.dataUrl.startsWith('data:'));
+        submitBtn.textContent = hasNewPhotos ? 'Compression des photos…' : 'Envoi en cours…';
 
         try {
+            const photoDataUrls = uploadedPhotos.map(p => p.dataUrl);
+
             if (editingId) {
-                submitBtn.textContent = 'Upload des photos…';
-                const photos = await uploadPhotos(editingId);
-                submitBtn.textContent = 'Sauvegarde…';
+                submitBtn.textContent = 'Sauvegarde des photos…';
+                await savePhotos(editingId, photoDataUrls);
+                submitBtn.textContent = 'Finalisation…';
                 await updateDoc(doc(db, "letters", editingId), {
-                    title, text, motif: selectedMotif, photos, editedAt: serverTimestamp()
+                    title, text, motif: selectedMotif,
+                    hasPhotos: photoDataUrls.length > 0,
+                    photoCount: photoDataUrls.length,
+                    editedAt: serverTimestamp()
                 });
             } else {
-                // Créer d'abord le doc pour avoir l'ID
+                submitBtn.textContent = 'Création de la lettre…';
                 const docRef = await addDoc(lettersCol, {
-                    title, text, motif: selectedMotif, photos: [],
-                    author: currentUser, createdAt: serverTimestamp(),
+                    title, text, motif: selectedMotif,
+                    hasPhotos: photoDataUrls.length > 0,
+                    photoCount: photoDataUrls.length,
+                    author: currentUser,
+                    createdAt: serverTimestamp(),
                     readBy: [], readAt: null, reactions: {}
                 });
-                if (uploadedPhotos.length > 0) {
-                    submitBtn.textContent = 'Upload des photos…';
-                    const photos = await uploadPhotos(docRef.id);
-                    submitBtn.textContent = 'Finalisation…';
-                    await updateDoc(docRef, { photos });
+                if (photoDataUrls.length > 0) {
+                    submitBtn.textContent = 'Sauvegarde des photos…';
+                    await savePhotos(docRef.id, photoDataUrls);
                 }
             }
             resetForm();
@@ -1121,10 +1106,9 @@
             console.error('Erreur envoi:', e);
             const msg = document.getElementById('statusMsg');
             msg.className = 'error'; msg.style.display = 'block';
-            msg.textContent = 'Erreur lors de l\'envoi. Vérifiez votre connexion.';
-            setTimeout(() => { msg.style.display = 'none'; }, 4000);
-        }
-        finally {
+            msg.textContent = 'Erreur lors de l\'envoi : ' + (e.message || e.code || e);
+            setTimeout(() => { msg.style.display = 'none'; }, 5000);
+        } finally {
             submitBtn.disabled = false;
             submitBtn.innerHTML = 'Sceller &amp; envoyer la lettre';
         }
