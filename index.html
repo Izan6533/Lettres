@@ -701,19 +701,32 @@
 
     let db, storage, lettersCol, statusDoc;
     let usingLocal = false;
+    let storageAvailable = false;
     let currentUser = localStorage.getItem('letter_user') || null;
     let isInitialLoad = true;
     let editingId = null, activeLetter = null, allLetters = [];
     let selectedMotif = 'none';
-    let uploadedPhotos = []; // [{dataUrl, name}]
+    let uploadedPhotos = [];
 
+    // Initialisation Firestore — séparée de Storage pour éviter qu'une erreur Storage
+    // ne bloque tout le reste
     try {
         const app = initializeApp(FIREBASE_CONFIG);
         db = getFirestore(app);
-        storage = getStorage(app);
         lettersCol = collection(db, "letters");
         statusDoc = doc(db, "status", "typing");
-    } catch(e) { usingLocal = true; }
+
+        // Storage est optionnel : si ça plante, les lettres sans photo marchent quand même
+        try {
+            storage = getStorage(app);
+            storageAvailable = true;
+        } catch(se) {
+            console.warn('Firebase Storage non disponible — photos désactivées', se);
+        }
+    } catch(e) {
+        console.error('Firebase init échoué :', e);
+        usingLocal = true;
+    }
 
     // ── WORD COUNTER ──
     window.updateWordCount = function() {
@@ -1041,16 +1054,29 @@
         const urls = [];
         for (let i = 0; i < uploadedPhotos.length; i++) {
             const ph = uploadedPhotos[i];
-            // Si déjà une URL http (photo existante depuis Storage), garder telle quelle
+            // Déjà une URL http (photo existante depuis Storage) → garder telle quelle
             if (ph.dataUrl.startsWith('http')) {
                 urls.push(ph.dataUrl);
                 continue;
             }
-            const blob = await compressImage(ph.dataUrl);
-            const storageRef = ref(storage, `letters/${letterId}/photo_${Date.now()}_${i}.jpg`);
-            await uploadBytes(storageRef, blob);
-            const url = await getDownloadURL(storageRef);
-            urls.push(url);
+            // Storage disponible → upload compressé
+            if (storageAvailable) {
+                try {
+                    const blob = await compressImage(ph.dataUrl);
+                    const storageRef = ref(storage, `letters/${letterId}/photo_${Date.now()}_${i}.jpg`);
+                    await uploadBytes(storageRef, blob);
+                    const url = await getDownloadURL(storageRef);
+                    urls.push(url);
+                    continue;
+                } catch(e) {
+                    console.warn('Upload Storage échoué, fallback base64 compressé :', e);
+                }
+            }
+            // Fallback : base64 compressé (si Storage indispo ou erreur)
+            const blob = await compressImage(ph.dataUrl, 800, 0.7);
+            const reader = new FileReader();
+            const b64 = await new Promise(res => { reader.onload = e => res(e.target.result); reader.readAsDataURL(blob); });
+            urls.push(b64);
         }
         return urls;
     }
@@ -1186,17 +1212,39 @@
     };
 
     function initFirebaseListener() {
-        onSnapshot(query(lettersCol, orderBy("createdAt","desc")), snap => {
-            const letters = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            if (!isInitialLoad && letters.length > allLetters.length) {
-                const newest = letters[0];
-                if (newest.author !== currentUser) {
-                    sendNotification(`💌 Nouveau mot de ${newest.author}`, newest.title);
+        // Affiche un état de chargement clair
+        document.getElementById('lettersList').innerHTML =
+            `<div class="empty-state" style="opacity:0.5;font-size:16px;">⏳ Chargement des lettres…</div>`;
+
+        try {
+            onSnapshot(
+                query(lettersCol, orderBy("createdAt", "desc")),
+                (snap) => {
+                    const letters = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    if (!isInitialLoad && letters.length > allLetters.length) {
+                        const newest = letters[0];
+                        if (newest.author !== currentUser) {
+                            sendNotification(`💌 Nouveau mot de ${newest.author}`, newest.title);
+                        }
+                    }
+                    isInitialLoad = false;
+                    renderLetters(letters);
+                },
+                (err) => {
+                    // Erreur Firestore (règles, réseau…) — affichée clairement
+                    console.error('Firestore listener error:', err);
+                    document.getElementById('lettersList').innerHTML =
+                        `<div class="empty-state" style="color:#C0392B;opacity:1;font-size:15px;">
+                            ⚠️ Impossible de charger les lettres.<br>
+                            <span style="font-size:13px;opacity:0.7;">Vérifie ta connexion ou les règles Firestore.<br>Erreur : ${err.code || err.message}</span>
+                        </div>`;
                 }
-            }
-            isInitialLoad = false;
-            renderLetters(letters);
-        });
+            );
+        } catch(e) {
+            console.error('initFirebaseListener crash:', e);
+            document.getElementById('lettersList').innerHTML =
+                `<div class="empty-state" style="color:#C0392B;opacity:1;">⚠️ Erreur de connexion Firebase.</div>`;
+        }
     }
 
     window.checkUser();
