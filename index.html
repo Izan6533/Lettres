@@ -7,23 +7,24 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
-
     <style>
         :root {
             --ivory:    #FAF7F0;
-            --ivory-dk: #F0EAD8;
+            --ivory-dk: #EDE5D0;
             --ink:      #2C1810;
-            --ink-soft: #5C3D2E;
+            --ink-soft: #7A5C4A;
             --bordeaux: #8B2252;
+            --bordeaux-lt: #B8527A;
             --gold:     #C9A96E;
-            --gold-lt:  #E8D5A8;
-            --rose:     #F2D7E0;
+            --gold-lt:  #EDD9A8;
+            --rose:     #F9E8EF;
+            --rose-dk:  #F2D0DF;
             --izan:     #C0392B;
-            --thalia:   #F3A3C1;
+            --thalia:   #D4699A;
             --paper:    #FFFDF8;
-            --shadow:   rgba(44,24,16,0.12);
+            --shadow:   rgba(44,24,16,0.10);
+            --shadow-deep: rgba(44,24,16,0.22);
         }
-
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
@@ -32,124 +33,433 @@
             color: var(--ink);
             min-height: 100vh;
             background-image:
-                radial-gradient(ellipse at 10% 20%, rgba(201,169,110,0.08) 0%, transparent 60%),
-                radial-gradient(ellipse at 90% 80%, rgba(242,215,224,0.15) 0%, transparent 60%);
+                radial-gradient(ellipse at 8% 15%, rgba(212,105,154,0.09) 0%, transparent 55%),
+                radial-gradient(ellipse at 92% 85%, rgba(201,169,110,0.10) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 50%, rgba(255,253,248,0.4) 0%, transparent 80%);
         }
 
+        /* ── FLOATING PETALS DECORATION ── */
+        .petal {
+            position: fixed; pointer-events: none; font-size: 18px; opacity: 0.12;
+            animation: float-petal linear infinite;
+            z-index: 0;
+        }
+        @keyframes float-petal {
+            0% { transform: translateY(-30px) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.12; }
+            90% { opacity: 0.12; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* ── LOGIN ── */
         #loginOverlay {
-            position: fixed; inset: 0; background: var(--ivory); z-index: 2000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+            position: fixed; inset: 0; z-index: 2000;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+            background: radial-gradient(ellipse at center, #FFF5F8 0%, #FAF0EC 100%);
         }
         .login-box {
-            background: var(--paper); border: 1px solid var(--ivory-dk); padding: 40px;
-            border-radius: 4px; box-shadow: 0 10px 40px var(--shadow); text-align: center; max-width: 400px; width: 100%;
+            background: var(--paper); border: 1px solid var(--rose-dk);
+            padding: 48px 40px 40px; border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(139,34,82,0.12), 0 0 0 1px rgba(201,169,110,0.15);
+            text-align: center; max-width: 380px; width: 100%; position: relative;
         }
-        .login-box h2 { font-family: 'Cormorant Garamond', serif; font-size: 28px; margin-bottom: 25px; font-style: italic; color: var(--bordeaux); }
-        .login-buttons { display: flex; gap: 15px; }
-        .login-btn { flex: 1; padding: 15px; border: none; border-radius: 4px; font-family: 'EB Garamond', serif; font-size: 18px; color: white; cursor: pointer; transition: transform 0.2s; }
-        .login-btn:active { transform: scale(0.98); }
-        .btn-izan-login { background: var(--izan); }
-        .btn-thalia-login { background: var(--thalia); color: #2C1810; }
+        .login-box::before {
+            content: '💌'; position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+            font-size: 40px; filter: drop-shadow(0 4px 8px rgba(139,34,82,0.3));
+        }
+        .login-box h2 {
+            font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 300;
+            font-style: italic; color: var(--bordeaux); margin-bottom: 8px; margin-top: 8px;
+        }
+        .login-box p { font-size: 15px; color: var(--ink-soft); margin-bottom: 28px; }
+        .login-buttons { display: flex; gap: 14px; }
+        .login-btn {
+            flex: 1; padding: 16px 12px; border: none; border-radius: 10px;
+            font-family: 'Cormorant Garamond', serif; font-size: 20px; color: white;
+            cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; font-style: italic;
+        }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+        .btn-izan-login { background: linear-gradient(135deg, #C0392B, #96281B); }
+        .btn-thalia-login { background: linear-gradient(135deg, #D4699A, #B5507E); color: white; }
 
-        .site-header { text-align: center; padding: 40px 20px 20px; position: relative; }
-        .user-status-bar { max-width: 1100px; margin: 0 auto; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
-        .current-user-tag { font-weight: 500; padding: 4px 12px; border-radius: 20px; color: white; }
-        .tag-izan { background: var(--izan); }
-        .tag-thalia { background: var(--thalia); color: #2C1810; }
-        .logout-link { color: var(--gold); cursor: pointer; text-decoration: underline; }
+        /* ── HEADER ── */
+        .user-status-bar {
+            max-width: 1100px; margin: 0 auto; padding: 12px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; position: relative; z-index: 10;
+        }
+        .current-user-tag {
+            font-weight: 500; padding: 5px 16px; border-radius: 20px; color: white;
+            font-family: 'Cormorant Garamond', serif; font-size: 16px; font-style: italic;
+        }
+        .tag-izan { background: linear-gradient(135deg, var(--izan), #96281B); }
+        .tag-thalia { background: linear-gradient(135deg, var(--thalia), #B5507E); }
+        .logout-link {
+            color: var(--gold); cursor: pointer; font-size: 13px;
+            text-decoration: none; border: 1px solid var(--gold-lt);
+            padding: 4px 12px; border-radius: 20px; transition: background 0.2s;
+        }
+        .logout-link:hover { background: var(--gold-lt); }
 
-        .site-header::after { content: ''; display: block; width: 120px; height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent); margin: 15px auto 0; }
-        .site-header h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 5vw, 46px); font-weight: 300; color: var(--ink); line-height: 1.2; }
+        .site-header { text-align: center; padding: 28px 20px 24px; position: relative; z-index: 1; }
+        .site-header h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(26px, 5vw, 44px); font-weight: 300; color: var(--ink);
+            line-height: 1.25;
+        }
         .site-header h1 em { font-style: italic; color: var(--bordeaux); }
+        .header-ornament {
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px; margin-top: 14px; color: var(--gold); font-size: 13px;
+            letter-spacing: 0.25em; text-transform: uppercase;
+        }
+        .header-ornament::before, .header-ornament::after {
+            content: ''; display: block; width: 60px; height: 1px;
+            background: linear-gradient(to right, transparent, var(--gold));
+        }
+        .header-ornament::after { background: linear-gradient(to left, transparent, var(--gold)); }
 
-        .layout { display: grid; grid-template-columns: 1fr; gap: 32px; max-width: 1100px; margin: 0 auto; padding: 0 20px 60px; }
-        @media (min-width: 800px) { .layout { grid-template-columns: 420px 1fr; align-items: start; } .write-section { position: sticky; top: 24px; } }
+        /* ── LAYOUT ── */
+        .layout {
+            display: grid; grid-template-columns: 1fr; gap: 28px;
+            max-width: 1100px; margin: 0 auto; padding: 0 20px 70px;
+            position: relative; z-index: 1;
+        }
+        @media (min-width: 820px) {
+            .layout { grid-template-columns: 400px 1fr; align-items: start; }
+            .write-section { position: sticky; top: 20px; }
+        }
 
-        .write-section { background: var(--paper); border: 1px solid var(--ivory-dk); border-radius: 4px; padding: 32px 28px 28px; box-shadow: 0 8px 32px var(--shadow), 0 1px 0 var(--gold-lt) inset; position: relative; }
-        .write-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(to right, var(--bordeaux), var(--gold), var(--bordeaux)); }
-        .panel-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--bordeaux); margin-bottom: 24px; font-style: italic; }
+        /* ── WRITE PANEL ── */
+        .write-section {
+            background: var(--paper); border: 1px solid var(--ivory-dk);
+            border-radius: 16px; padding: 32px 28px 28px;
+            box-shadow: 0 8px 32px var(--shadow), 0 0 0 1px rgba(201,169,110,0.1) inset;
+            position: relative; overflow: hidden;
+        }
+        .write-section::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+            background: linear-gradient(to right, var(--bordeaux), var(--gold), var(--thalia));
+        }
+        .write-section::after {
+            content: '✦'; position: absolute; top: 12px; right: 20px;
+            color: var(--gold); font-size: 16px; opacity: 0.4;
+        }
+        .panel-title {
+            font-family: 'Cormorant Garamond', serif; font-size: 22px;
+            color: var(--bordeaux); margin-bottom: 22px; font-style: italic;
+        }
+        .field-group { margin-bottom: 16px; }
+        .field-group label {
+            display: block; font-size: 10px; letter-spacing: 0.22em;
+            text-transform: uppercase; color: var(--gold); margin-bottom: 6px;
+        }
+        .field-group input, .field-group textarea, .field-group select {
+            width: 100%; padding: 11px 14px;
+            background: var(--ivory); border: 1px solid var(--ivory-dk);
+            border-radius: 8px; font-family: 'EB Garamond', serif; font-size: 17px;
+            color: var(--ink); outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .field-group input:focus, .field-group textarea:focus, .field-group select:focus {
+            border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,169,110,0.15);
+        }
+        .field-group textarea { height: 150px; resize: vertical; line-height: 1.7; }
 
-        .field-group { margin-bottom: 18px; }
-        .field-group label { display: block; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
-        .field-group input, .field-group textarea, .field-group select { width: 100%; padding: 12px 14px; background: var(--ivory); border: 1px solid var(--ivory-dk); border-radius: 3px; font-family: 'EB Garamond', serif; font-size: 17px; color: var(--ink); outline: none; }
-        .field-group textarea { height: 180px; resize: vertical; line-height: 1.7; }
+        /* ── MOTIF SELECTOR ── */
+        .motif-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 4px;
+        }
+        .motif-option {
+            border: 2px solid var(--ivory-dk); border-radius: 10px; padding: 10px 4px 6px;
+            cursor: pointer; text-align: center; font-size: 20px; background: var(--ivory);
+            transition: border-color 0.2s, transform 0.15s; position: relative; overflow: hidden;
+        }
+        .motif-option span { display: block; font-size: 9px; color: var(--ink-soft); margin-top: 3px; letter-spacing: 0.05em; }
+        .motif-option:hover { border-color: var(--gold); transform: translateY(-2px); }
+        .motif-option.selected { border-color: var(--bordeaux); background: var(--rose); box-shadow: 0 0 0 1px var(--bordeaux); }
+        .motif-preview-bg {
+            position: absolute; inset: 0; opacity: 0.15; background-size: 30px 30px;
+        }
 
-        .seal-btn { width: 100%; padding: 16px; margin-top: 6px; background: var(--bordeaux); color: white; border: none; border-radius: 3px; font-family: 'Cormorant Garamond', serif; font-size: 18px; font-style: italic; cursor: pointer; }
-        .cancel-btn { width: 100%; padding: 10px; margin-top: 10px; background: transparent; border: 1px solid var(--ivory-dk); border-radius: 3px; color: var(--ink-soft); font-family: 'EB Garamond', serif; cursor: pointer; }
-        
-        #statusMsg { display: none; padding: 10px 14px; border-radius: 3px; font-size: 14px; margin-bottom: 14px; }
+        /* ── PHOTO UPLOAD ── */
+        .photo-upload-zone {
+            border: 2px dashed var(--ivory-dk); border-radius: 10px; padding: 16px;
+            text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+            background: var(--ivory); position: relative;
+        }
+        .photo-upload-zone:hover { border-color: var(--gold); background: rgba(201,169,110,0.05); }
+        .photo-upload-zone input[type=file] { display: none; }
+        .photo-upload-icon { font-size: 28px; margin-bottom: 6px; }
+        .photo-upload-text { font-size: 14px; color: var(--ink-soft); }
+        .photo-upload-sub { font-size: 12px; color: var(--gold); margin-top: 3px; }
+        .photos-preview {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
+        }
+        .photo-thumb {
+            position: relative; width: 72px; height: 72px; border-radius: 8px;
+            overflow: hidden; border: 2px solid var(--ivory-dk); flex-shrink: 0;
+        }
+        .photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-thumb-remove {
+            position: absolute; top: 2px; right: 2px; background: rgba(139,34,82,0.85);
+            color: white; border: none; border-radius: 50%; width: 18px; height: 18px;
+            font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            line-height: 1;
+        }
+        .photos-count { font-size: 12px; color: var(--ink-soft); margin-top: 6px; text-align: center; }
+
+        /* ── BUTTONS ── */
+        .seal-btn {
+            width: 100%; padding: 15px; margin-top: 8px;
+            background: linear-gradient(135deg, var(--bordeaux), #6B1840);
+            color: white; border: none; border-radius: 10px;
+            font-family: 'Cormorant Garamond', serif; font-size: 19px;
+            font-style: italic; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+            position: relative; overflow: hidden;
+        }
+        .seal-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,34,82,0.35); }
+        .seal-btn::after { content: ' 💌'; }
+        .cancel-btn {
+            width: 100%; padding: 9px; margin-top: 8px;
+            background: transparent; border: 1px solid var(--ivory-dk);
+            border-radius: 8px; color: var(--ink-soft);
+            font-family: 'EB Garamond', serif; font-size: 15px; cursor: pointer;
+        }
+        #statusMsg {
+            display: none; padding: 10px 14px; border-radius: 8px;
+            font-size: 14px; margin-bottom: 14px;
+        }
         #statusMsg.error { background: #fde8e8; color: #8B1010; border: 1px solid #f5c0c0; }
         #statusMsg.success { background: #edf7ed; color: #2d6a2d; border: 1px solid #b8ddb8; }
-        #statusMsg.loading { background: var(--ivory-dk); color: var(--ink-soft); border: 1px solid var(--gold-lt); }
+        #statusMsg.loading { background: var(--ivory-dk); color: var(--ink-soft); }
 
-        #configBanner { background: #fff8e6; border: 1px solid var(--gold); border-radius: 4px; padding: 20px 24px; margin: 0 20px 28px; max-width: 1100px; display: none; }
-
-        /* ─── INDICATEUR DE FRAPPE ─── */
+        /* ── TYPING INDICATOR ── */
         .typing-indicator {
-            font-family: 'Caveat', cursive; font-size: 20px; color: var(--bordeaux);
-            margin-bottom: 15px; display: none; animation: pulse 1.5s infinite;
+            font-family: 'Caveat', cursive; font-size: 19px; color: var(--thalia);
+            margin-bottom: 14px; display: none; padding: 8px 14px;
+            background: var(--rose); border-radius: 8px; border: 1px solid var(--rose-dk);
         }
-        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+        .typing-dots { display: inline-block; animation: dots 1.4s infinite; }
+        @keyframes dots { 0%,20%{content:'.'} 40%{content:'..'} 60%,100%{content:'...'} }
 
-        .history-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; border-bottom: 1px solid var(--gold-lt); padding-bottom: 12px; margin-bottom: 20px; display: flex; align-items: center; }
-        .history-count { font-family: 'EB Garamond', serif; font-size: 13px; color: var(--gold); margin-left: auto; }
+        /* ── LETTERS LIST ── */
+        .history-title {
+            font-family: 'Cormorant Garamond', serif; font-size: 23px; font-style: italic;
+            color: var(--ink); border-bottom: 1px solid var(--gold-lt);
+            padding-bottom: 12px; margin-bottom: 18px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .history-count {
+            font-family: 'EB Garamond', serif; font-size: 13px; font-style: normal;
+            color: var(--gold); margin-left: auto; background: var(--gold-lt);
+            padding: 3px 10px; border-radius: 20px;
+        }
 
-        .read-status-container { position: absolute; top: 14px; right: 16px; display: flex; flex-direction: column; align-items: flex-end; z-index: 5; }
-        .read-status-indicator { font-size: 16px; opacity: 0.9; }
-        .read-date { font-size: 11px; color: var(--ink-soft); opacity: 0.8; margin-top: 3px; font-style: italic; white-space: nowrap; }
+        .letter-card {
+            background: var(--paper); border: 1px solid var(--ivory-dk);
+            border-radius: 14px; margin-bottom: 12px;
+            box-shadow: 0 3px 12px var(--shadow); overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .letter-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow-deep); }
+        .letter-card-accent { height: 5px; width: 100%; }
+        .accent-izan { background: linear-gradient(to right, #C0392B, #E05C4B, #C0392B); }
+        .accent-thalia { background: linear-gradient(to right, #D4699A, #F0A0C8, #D4699A); }
 
-        .letter-card { background: var(--paper); border: 1px solid var(--ivory-dk); border-radius: 4px; margin-bottom: 14px; box-shadow: 0 2px 10px var(--shadow); position: relative; }
-        .letter-card-accent { height: 4px; width: 100%; }
-        .accent-izan { background: linear-gradient(to right, var(--izan), #e05c4b); }
-        .accent-thalia { background: linear-gradient(to right, var(--thalia), #c76e9a); }
-
-        .letter-card-body { display: flex; align-items: center; padding: 16px 100px 16px 18px; gap: 14px; }
-        .letter-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 19px; color: white; flex-shrink: 0; }
-        .avatar-izan { background: var(--izan); }
-        .avatar-thalia { background: var(--thalia); color: #2C1810; }
+        .letter-card-body { display: flex; align-items: center; padding: 14px 14px 10px 16px; gap: 13px; }
+        .letter-avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Cormorant Garamond', serif; font-size: 20px; font-style: italic;
+            color: white; flex-shrink: 0; box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        .avatar-izan { background: linear-gradient(135deg, var(--izan), #96281B); }
+        .avatar-thalia { background: linear-gradient(135deg, var(--thalia), #B5507E); }
 
         .letter-info { flex-grow: 1; cursor: pointer; min-width: 0; }
-        .letter-info h3 { font-family: 'Cormorant Garamond', serif; font-size: 19px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .letter-meta { font-size: 13px; color: var(--ink-soft); margin-top: 2px; opacity: 0.75; }
+        .letter-info h3 {
+            font-family: 'Cormorant Garamond', serif; font-size: 19px; font-style: italic;
+            margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .letter-meta { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
 
         .card-actions { display: flex; gap: 6px; flex-shrink: 0; }
-        .icon-btn { width: 34px; height: 34px; border: none; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; background: var(--ivory-dk); }
-        .btn-del { background: #f5e8e8; }
-
-        /* ─── BARRE DE RÉACTIONS ÉMOJIS ─── */
-        .reaction-bar {
-            display: flex; gap: 8px; padding: 8px 18px 12px; border-top: 1px dashed var(--ivory-dk); align-items: center;
+        .icon-btn {
+            width: 34px; height: 34px; border: none; border-radius: 50%;
+            font-size: 15px; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; background: var(--ivory); transition: background 0.2s;
         }
-        .reaction-btn { background: none; border: 1px solid var(--ivory-dk); border-radius: 20px; font-size: 14px; padding: 4px 8px; cursor: pointer; opacity: 0.6; transition: 0.2s; }
-        .reaction-btn:hover { opacity: 1; background: var(--ivory); }
-        .reaction-display { font-size: 14px; margin-left: auto; display: flex; gap: 5px; }
-        .reaction-badge { background: var(--rose); padding: 3px 6px; border-radius: 10px; font-size: 12px; }
+        .icon-btn:hover { background: var(--ivory-dk); }
+        .btn-del { background: #FAF0F0; }
+        .btn-del:hover { background: #f5e0e0; }
 
-        .empty-state { text-align: center; padding: 50px 20px; color: var(--ink-soft); opacity: 0.6; }
+        .read-status-row {
+            padding: 4px 16px 2px; display: flex; justify-content: flex-end;
+            align-items: center; gap: 6px;
+        }
+        .read-status-indicator { font-size: 15px; }
+        .read-date { font-size: 11px; color: var(--ink-soft); font-style: italic; }
 
-        /* ─── READER & MOTIFS RÉPÉTÉS ─── */
-        #readerView { display: none; position: fixed; inset: 0; background: rgba(20,10,5,0.85); backdrop-filter: blur(4px); z-index: 1000; overflow-y: auto; padding: 30px 0 60px; }
-        .reader-topbar { max-width: 740px; margin: 0 auto 18px; padding: 0 16px; display: flex; justify-content: space-between; gap: 10px; }
-        .reader-btn { background: rgba(255,255,255,0.9); border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; }
-        .a4-sheet { background: var(--paper); width: calc(100% - 32px); max-width: 700px; min-height: 500px; margin: 0 auto; padding: clamp(40px, 8vw, 80px) clamp(30px, 7vw, 70px); position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.5); overflow: hidden; }
-        
-        /* C'est ici que la magie des motifs répétés opère ! */
-        .pattern-hearts { background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='20' y='40' font-size='20' opacity='0.03'%3E❤️%3C/text%3E%3C/svg%3E"); }
-        .pattern-flowers { background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='20' y='40' font-size='20' opacity='0.04'%3E🌸%3C/text%3E%3C/svg%3E"); }
-        .pattern-stars { background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='20' y='40' font-size='20' opacity='0.04'%3E✨%3C/text%3E%3C/svg%3E"); }
-        .pattern-vintage { background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='20' y='40' font-size='20' opacity='0.03'%3E📜%3C/text%3E%3C/svg%3E"); }
+        /* ── RÉACTIONS ── */
+        .reaction-bar {
+            display: flex; gap: 6px; padding: 8px 16px 12px;
+            border-top: 1px dashed var(--ivory-dk); align-items: center; flex-wrap: wrap;
+        }
+        .reaction-label { font-size: 11px; color: var(--ink-soft); letter-spacing: 0.05em; }
+        .reaction-btn {
+            background: var(--ivory); border: 1.5px solid var(--ivory-dk);
+            border-radius: 20px; font-size: 16px; padding: 4px 9px; cursor: pointer;
+            transition: 0.18s; line-height: 1;
+        }
+        .reaction-btn:hover { background: var(--rose); border-color: var(--bordeaux-lt); transform: scale(1.12); }
+        .reaction-btn.my-reaction { background: var(--rose); border-color: var(--bordeaux); box-shadow: 0 0 0 1px var(--bordeaux); }
+        .reaction-display { margin-left: auto; display: flex; gap: 5px; flex-wrap: wrap; }
+        .reaction-badge {
+            background: var(--rose); padding: 3px 8px; border-radius: 12px;
+            font-size: 13px; border: 1px solid var(--rose-dk);
+        }
+        .reaction-disabled { opacity: 0.35; pointer-events: none; font-size: 11px; color: var(--ink-soft); font-style: italic; }
 
-        .sheet-meta { font-family: 'EB Garamond', serif; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); border-bottom: 1px solid var(--ivory-dk); padding-bottom: 14px; margin-bottom: 28px; position: relative; z-index: 2; }
-        .sheet-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(26px, 5vw, 42px); font-style: italic; color: var(--bordeaux); text-align: center; margin-bottom: 32px; position: relative; z-index: 2;}
-        .sheet-content { font-family: 'Caveat', cursive; font-size: clamp(20px, 4vw, 27px); line-height: 1.75; white-space: pre-wrap; position: relative; z-index: 2;}
-        .sheet-footer { margin-top: 48px; text-align: right; font-family: 'Caveat', cursive; font-size: 22px; font-style: italic; position: relative; z-index: 2;}
+        .empty-state {
+            text-align: center; padding: 60px 20px; color: var(--ink-soft); opacity: 0.5;
+            font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 20px;
+        }
+        .empty-state::before { content: '💌'; display: block; font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+
+        /* ── READER ── */
+        #readerView {
+            display: none; position: fixed; inset: 0;
+            background: rgba(20,8,4,0.88); backdrop-filter: blur(6px);
+            z-index: 1000; overflow-y: auto; padding: 24px 0 50px;
+        }
+        .reader-topbar {
+            max-width: 740px; margin: 0 auto 16px; padding: 0 16px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .reader-btn {
+            background: rgba(255,253,248,0.92); border: none;
+            padding: 10px 20px; border-radius: 50px; cursor: pointer;
+            font-family: 'EB Garamond', serif; font-size: 15px;
+            transition: background 0.2s; color: var(--ink);
+        }
+        .reader-btn:hover { background: white; }
+        .print-btn {
+            background: var(--bordeaux); color: white;
+        }
+        .print-btn:hover { background: #6B1840; }
+
+        /* ── A4 SHEET ── */
+        .a4-sheet {
+            background: var(--paper);
+            width: calc(100% - 32px); max-width: 700px;
+            min-height: 500px; margin: 0 auto;
+            padding: clamp(40px, 8vw, 80px) clamp(30px, 7vw, 70px);
+            position: relative; overflow: hidden;
+            box-shadow: 0 24px 70px rgba(0,0,0,0.6);
+            border-radius: 4px;
+        }
+
+        /* ── MOTIFS VISIBLES ── */
+        .a4-sheet .pattern-layer {
+            position: absolute; inset: 0; pointer-events: none;
+            z-index: 0; border-radius: 4px;
+        }
+        /* Motif cœurs */
+        .motif-hearts .pattern-layer {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='15' y='38' font-size='24' opacity='0.12'%3E%E2%9D%A4%EF%B8%8F%3C/text%3E%3C/svg%3E");
+            background-size: 60px 60px;
+        }
+        /* Motif fleurs */
+        .motif-flowers .pattern-layer {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='12' y='38' font-size='26' opacity='0.12'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E");
+            background-size: 60px 60px;
+        }
+        /* Motif étoiles */
+        .motif-stars .pattern-layer {
+            background-image: url("data:image/svg+xml,%3Csvg width='55' height='55' viewBox='0 0 55 55' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='10' y='36' font-size='24' opacity='0.13'%3E%E2%9C%A8%3C/text%3E%3C/svg%3E");
+            background-size: 55px 55px;
+        }
+        /* Motif vintage */
+        .motif-vintage .pattern-layer {
+            background-image: url("data:image/svg+xml,%3Csvg width='70' height='70' viewBox='0 0 70 70' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='18' y='42' font-size='26' opacity='0.10'%3E%F0%9F%93%9C%3C/text%3E%3C/svg%3E");
+            background-size: 70px 70px;
+        }
+        .motif-none .pattern-layer { display: none; }
+
+        /* Bordure décorative selon motif */
+        .motif-hearts { border: 2px solid rgba(192,57,43,0.15); }
+        .motif-flowers { border: 2px solid rgba(212,105,154,0.15); }
+        .motif-stars { border: 2px solid rgba(201,169,110,0.18); }
+        .motif-vintage { border: 2px solid rgba(44,24,16,0.12); }
+
+        /* Miniature motif dans card */
+        .motif-badge {
+            display: inline-block; font-size: 13px; margin-left: 6px;
+            vertical-align: middle; opacity: 0.7;
+        }
+
+        .sheet-meta {
+            font-family: 'EB Garamond', serif; font-size: 13px; letter-spacing: 0.1em;
+            text-transform: uppercase; color: var(--gold);
+            border-bottom: 1px solid var(--ivory-dk); padding-bottom: 14px;
+            margin-bottom: 26px; position: relative; z-index: 2;
+        }
+        .sheet-title {
+            font-family: 'Cormorant Garamond', serif; font-size: clamp(26px,5vw,40px);
+            font-style: italic; color: var(--bordeaux); text-align: center;
+            margin-bottom: 30px; position: relative; z-index: 2; line-height: 1.2;
+        }
+        .sheet-content {
+            font-family: 'Caveat', cursive; font-size: clamp(19px,4vw,26px);
+            line-height: 1.8; white-space: pre-wrap; position: relative; z-index: 2;
+        }
+        .sheet-footer {
+            margin-top: 40px; text-align: right; font-family: 'Caveat', cursive;
+            font-size: 22px; font-style: italic; position: relative; z-index: 2;
+            color: var(--bordeaux-lt);
+        }
+        .sheet-photos {
+            display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px;
+            position: relative; z-index: 2;
+        }
+        .sheet-photo {
+            border-radius: 6px; overflow: hidden;
+            border: 2px solid var(--ivory-dk); flex-shrink: 0;
+        }
+        .sheet-photo img { display: block; width: 180px; height: 140px; object-fit: cover; }
+
+        /* ── PRINT ── */
+        @media print {
+            body * { visibility: hidden; }
+            #readerView, #readerView * { visibility: visible; }
+            #readerView {
+                position: fixed; inset: 0; background: white;
+                backdrop-filter: none; padding: 0; overflow: visible;
+            }
+            .reader-topbar { display: none !important; }
+            .a4-sheet {
+                box-shadow: none; width: 100%; max-width: 100%;
+                margin: 0; padding: 40px; border-radius: 0;
+                border: none !important;
+            }
+            .pattern-layer { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
     </style>
 </head>
 <body>
 
-<div id="loginOverlay" style="display: none;">
+<!-- Pétales décoratifs -->
+<div class="petal" style="left:5%;animation-duration:18s;animation-delay:0s;">🌸</div>
+<div class="petal" style="left:20%;animation-duration:22s;animation-delay:4s;">✨</div>
+<div class="petal" style="left:40%;animation-duration:16s;animation-delay:8s;">🌸</div>
+<div class="petal" style="left:65%;animation-duration:20s;animation-delay:2s;">💗</div>
+<div class="petal" style="left:80%;animation-duration:25s;animation-delay:6s;">✨</div>
+<div class="petal" style="left:92%;animation-duration:19s;animation-delay:11s;">🌸</div>
+
+<div id="loginOverlay" style="display:none;">
     <div class="login-box">
         <h2>Qui êtes-vous ?</h2>
+        <p>Choisissez votre identité pour lire et écrire vos lettres</p>
         <div class="login-buttons">
             <button class="login-btn btn-izan-login" onclick="loginAs('Izan')">Izan 💌</button>
             <button class="login-btn btn-thalia-login" onclick="loginAs('Thalia')">Thalia 🌸</button>
@@ -158,50 +468,101 @@
 </div>
 
 <div class="user-status-bar">
-    <div>Connecté en tant que : <span id="currentUserTag" class="current-user-tag">...</span></div>
-    <div class="logout-link" onclick="logout()">Changer de compte</div>
+    <div style="font-size:14px;color:var(--ink-soft);">
+        Connecté · <span id="currentUserTag" class="current-user-tag">...</span>
+    </div>
+    <div class="logout-link" onclick="logout()">Changer ↩</div>
 </div>
 
 <header class="site-header">
     <h1>Lettres pour quand on ne<br>peut pas <em>se voir</em></h1>
+    <div class="header-ornament">Notre petite poste</div>
 </header>
 
 <div class="layout">
+    <!-- ── FORMULAIRE ── -->
     <section class="write-section">
-        <h2 class="panel-title" id="formTitle">✦ Partage tes sentiments ✦</h2>
+        <h2 class="panel-title" id="formTitle">✦ Partage tes sentiments</h2>
         <div id="statusMsg"></div>
-        <div class="field-group"><label>Titre de ton trésor</label><input type="text" id="title" placeholder="Un doux titre…"></div>
-        <div class="field-group"><label>Ta lettre</label><textarea id="content" placeholder="Laisse ton cœur parler…"></textarea></div>
+
+        <div class="field-group">
+            <label>Titre de ton trésor</label>
+            <input type="text" id="title" placeholder="Un doux titre…">
+        </div>
+        <div class="field-group">
+            <label>Ta lettre</label>
+            <textarea id="content" placeholder="Laisse ton cœur parler…"></textarea>
+        </div>
+
+        <!-- MOTIF SELECTOR -->
         <div class="field-group">
             <label>Motif décoratif</label>
-            <select id="motif">
-                <option value="none">Aucun motif</option>
-                <option value="hearts">❤️ Cœurs</option>
-                <option value="flowers">🌸 Fleurs</option>
-                <option value="stars">✨ Étoiles</option>
-                <option value="vintage">📜 Style Ancien</option>
-            </select>
+            <div class="motif-grid" id="motifGrid">
+                <div class="motif-option selected" data-motif="none" onclick="selectMotif('none', this)">
+                    <span style="font-size:22px;">—</span>
+                    <span>Aucun</span>
+                </div>
+                <div class="motif-option" data-motif="hearts" onclick="selectMotif('hearts', this)">
+                    <div class="motif-preview-bg" style="background-image:url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='5' y='22' font-size='16' opacity='0.4'%3E%E2%9D%A4%3C/text%3E%3C/svg%3E\");background-size:30px;"></div>
+                    ❤️<span>Cœurs</span>
+                </div>
+                <div class="motif-option" data-motif="flowers" onclick="selectMotif('flowers', this)">
+                    <div class="motif-preview-bg" style="background-image:url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='3' y='22' font-size='16' opacity='0.4'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E\");background-size:30px;"></div>
+                    🌸<span>Fleurs</span>
+                </div>
+                <div class="motif-option" data-motif="stars" onclick="selectMotif('stars', this)">
+                    <div class="motif-preview-bg" style="background-image:url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='4' y='22' font-size='16' opacity='0.4'%3E%E2%9C%A8%3C/text%3E%3C/svg%3E\");background-size:30px;"></div>
+                    ✨<span>Étoiles</span>
+                </div>
+                <div class="motif-option" data-motif="vintage" onclick="selectMotif('vintage', this)">
+                    <div class="motif-preview-bg" style="background-image:url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='4' y='22' font-size='14' opacity='0.3'%3E%F0%9F%93%9C%3C/text%3E%3C/svg%3E\");background-size:30px;"></div>
+                    📜<span>Ancien</span>
+                </div>
+            </div>
         </div>
+
+        <!-- PHOTOS -->
+        <div class="field-group">
+            <label>Photos (jusqu'à 5)</label>
+            <div class="photo-upload-zone" onclick="document.getElementById('photoInput').click()">
+                <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotos(event)">
+                <div class="photo-upload-icon">📷</div>
+                <div class="photo-upload-text">Cliquer pour ajouter des photos</div>
+                <div class="photo-upload-sub">Galerie, appareil photo ou fichiers</div>
+            </div>
+            <div class="photos-preview" id="photosPreview"></div>
+            <div class="photos-count" id="photosCount"></div>
+        </div>
+
         <button class="seal-btn" id="submitBtn" onclick="saveLetter()">Sceller &amp; envoyer la lettre</button>
-        <button class="cancel-btn" id="cancelEditBtn" onclick="resetForm()" style="display:none;">Annuler</button>
+        <button class="cancel-btn" id="cancelEditBtn" onclick="resetForm()" style="display:none;">Annuler la modification</button>
     </section>
 
+    <!-- ── LISTE ── -->
     <section class="history-section">
-        <div id="typingIndicator" class="typing-indicator">Quelqu'un est en train d'écrire... ✍️</div>
-        
-        <h2 class="history-title">📜 Notre petite poste <span class="history-count" id="letterCount"></span></h2>
+        <div id="typingIndicator" class="typing-indicator" style="display:none;">
+            ✍️ <span id="typingName">Quelqu'un</span> est en train d'écrire<span class="typing-dots">...</span>
+        </div>
+        <h2 class="history-title">
+            📜 Notre petite poste
+            <span class="history-count" id="letterCount"></span>
+        </h2>
         <div id="lettersList"><div class="empty-state">Chargement…</div></div>
     </section>
 </div>
 
+<!-- ── READER ── -->
 <div id="readerView">
     <div class="reader-topbar">
         <button class="reader-btn" onclick="closeLetter()">⬅️ Retour</button>
+        <button class="reader-btn print-btn" onclick="window.print()">🖨️ Imprimer</button>
     </div>
     <div class="a4-sheet" id="fullSheet">
+        <div class="pattern-layer"></div>
         <div class="sheet-meta" id="sheetMeta"></div>
         <div class="sheet-title" id="sheetTitle"></div>
         <div class="sheet-content" id="sheetContent"></div>
+        <div class="sheet-photos" id="sheetPhotos"></div>
         <div class="sheet-footer" id="sheetFooter"></div>
     </div>
 </div>
@@ -219,31 +580,76 @@
         appId:             "1:1054625595553:web:eeed9b8c62d96259acf0e0"
     };
 
-    const FIREBASE_READY = true;
     let db, lettersCol, statusDoc;
     let usingLocal = false;
     let currentUser = localStorage.getItem('letter_user') || null;
-    let isInitialLoad = true; // Pour ne pas spammer les notifications au chargement
+    let isInitialLoad = true;
+    let editingId = null, activeLetter = null, allLetters = [];
+    let selectedMotif = 'none';
+    let uploadedPhotos = []; // [{dataUrl, name}]
 
-    if (FIREBASE_READY) {
-        try {
-            const app = initializeApp(FIREBASE_CONFIG);
-            db = getFirestore(app);
-            lettersCol = collection(db, "letters");
-            statusDoc = doc(db, "status", "typing");
-        } catch(e) { usingLocal = true; }
+    try {
+        const app = initializeApp(FIREBASE_CONFIG);
+        db = getFirestore(app);
+        lettersCol = collection(db, "letters");
+        statusDoc = doc(db, "status", "typing");
+    } catch(e) { usingLocal = true; }
+
+    // ── MOTIF SELECTION ──
+    window.selectMotif = function(motif, el) {
+        selectedMotif = motif;
+        document.querySelectorAll('.motif-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+    };
+
+    // ── PHOTO UPLOAD ──
+    window.handlePhotos = function(e) {
+        const files = Array.from(e.target.files);
+        const remaining = 5 - uploadedPhotos.length;
+        const toAdd = files.slice(0, remaining);
+        
+        toAdd.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                uploadedPhotos.push({ dataUrl: ev.target.result, name: file.name });
+                renderPhotoPreviews();
+            };
+            reader.readAsDataURL(file);
+        });
+        e.target.value = '';
+    };
+
+    function renderPhotoPreviews() {
+        const preview = document.getElementById('photosPreview');
+        const count = document.getElementById('photosCount');
+        preview.innerHTML = '';
+        uploadedPhotos.forEach((ph, i) => {
+            const thumb = document.createElement('div');
+            thumb.className = 'photo-thumb';
+            thumb.innerHTML = `<img src="${ph.dataUrl}" alt="photo"><button class="photo-thumb-remove" onclick="removePhoto(${i})">✕</button>`;
+            preview.appendChild(thumb);
+        });
+        count.textContent = uploadedPhotos.length > 0 ? `${uploadedPhotos.length}/5 photo${uploadedPhotos.length>1?'s':''}` : '';
+        // Update upload zone hint
+        const zone = document.querySelector('.photo-upload-sub');
+        if (uploadedPhotos.length >= 5) zone.textContent = 'Maximum atteint (5/5)';
+        else zone.textContent = `Galerie, appareil photo ou fichiers · ${5-uploadedPhotos.length} restante${5-uploadedPhotos.length>1?'s':''}`;
     }
 
-    // ── GESTION NOTIFICATIONS WEB ──
+    window.removePhoto = function(i) {
+        uploadedPhotos.splice(i, 1);
+        renderPhotoPreviews();
+    };
+
+    // ── AUTH ──
     function requestNotifications() {
         if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
             Notification.requestPermission();
         }
     }
-
     function sendNotification(title, body) {
         if ("Notification" in window && Notification.permission === "granted") {
-            new Notification(title, { body: body, icon: "💌" });
+            new Notification(title, { body });
         }
     }
 
@@ -252,40 +658,29 @@
             document.getElementById('loginOverlay').style.display = 'flex';
         } else {
             document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('currentUserTag').textContent = currentUser;
-            document.getElementById('currentUserTag').className = 'current-user-tag ' + (currentUser === 'Izan' ? 'tag-izan' : 'tag-thalia');
+            const tag = document.getElementById('currentUserTag');
+            tag.textContent = currentUser + (currentUser==='Izan' ? ' 💌' : ' 🌸');
+            tag.className = 'current-user-tag ' + (currentUser === 'Izan' ? 'tag-izan' : 'tag-thalia');
             requestNotifications();
         }
     };
-
     window.loginAs = function(user) {
         localStorage.setItem('letter_user', user);
         currentUser = user;
         window.checkUser();
         initFirebaseListener();
     };
-
     window.logout = function() {
         localStorage.removeItem('letter_user'); currentUser = null; window.checkUser();
     };
 
-    function formatDate(ts) {
-        if (!ts) return "";
-        const d = ts.toDate ? ts.toDate() : new Date(ts);
-        return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-    }
-
-    let editingId = null, activeLetter = null, allLetters = [];
-
-    // ── INDICATEUR DE FRAPPE (TYPING) ──
+    // ── TYPING INDICATOR ──
     let typingTimeout;
-    const inputFields = [document.getElementById('title'), document.getElementById('content')];
-    inputFields.forEach(el => {
+    [document.getElementById('title'), document.getElementById('content')].forEach(el => {
         el.addEventListener('input', () => {
             if (!usingLocal && currentUser) {
                 setDoc(statusDoc, { [currentUser]: Date.now() }, { merge: true });
                 clearTimeout(typingTimeout);
-                // Arrête d'indiquer la frappe après 3 secondes d'inactivité
                 typingTimeout = setTimeout(() => {
                     setDoc(statusDoc, { [currentUser]: 0 }, { merge: true });
                 }, 3000);
@@ -298,9 +693,8 @@
             const data = snap.data();
             const otherUser = currentUser === "Izan" ? "Thalia" : "Izan";
             const indicator = document.getElementById('typingIndicator');
-            // Si l'autre a tapé il y a moins de 5 secondes
             if (data && data[otherUser] && (Date.now() - data[otherUser] < 5000)) {
-                indicator.innerText = `${otherUser} est en train d'écrire... ✍️`;
+                document.getElementById('typingName').textContent = otherUser;
                 indicator.style.display = 'block';
             } else {
                 indicator.style.display = 'none';
@@ -308,19 +702,39 @@
         });
     }
 
-    // ── RÉACTIONS ÉMOJIS ──
-    window.addReaction = async function(letterId, emoji) {
-        if(usingLocal) return;
-        const l = allLetters.find(x => x.id === letterId);
-        if(!l) return;
-        
-        let currentReactions = l.reactions || {};
-        currentReactions[currentUser] = emoji; // Remplace l'ancienne réaction par la nouvelle
+    // ── REACTIONS ──
+    const EMOJIS = ['❤️','🥺','😂','✨','🫶'];
+    const MOTIF_EMOJI = { none:'', hearts:'❤️', flowers:'🌸', stars:'✨', vintage:'📜' };
 
+    window.addReaction = async function(letterId, emoji) {
+        if (usingLocal) return;
+        const l = allLetters.find(x => x.id === letterId);
+        if (!l) return;
+        // Cannot react to own letters
+        if (l.author === currentUser) return;
+
+        let reactions = { ...(l.reactions || {}) };
+        // Toggle: if same emoji already selected, remove it
+        if (reactions[currentUser] === emoji) {
+            delete reactions[currentUser];
+        } else {
+            reactions[currentUser] = emoji;
+        }
         try {
-            await updateDoc(doc(db, "letters", letterId), { reactions: currentReactions });
-        } catch(e) { console.error("Erreur réaction", e); }
+            await updateDoc(doc(db, "letters", letterId), { reactions });
+        } catch(e) { console.error(e); }
     };
+
+    // ── RENDER ──
+    function formatDate(ts) {
+        if (!ts) return "";
+        const d = ts.toDate ? ts.toDate() : new Date(ts);
+        return d.toLocaleDateString('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+    }
+
+    function escHtml(str) {
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
 
     function renderLetters(letters) {
         allLetters = letters;
@@ -328,122 +742,181 @@
         document.getElementById('letterCount').textContent = letters.length ? `${letters.length} lettre${letters.length > 1 ? 's' : ''}` : '';
 
         if (!letters.length) {
-            list.innerHTML = `<div class="empty-state">Aucune lettre pour le moment…</div>`;
+            list.innerHTML = `<div class="empty-state">Aucune lettre encore… commencez à écrire !</div>`;
             return;
         }
-
         list.innerHTML = '';
         letters.forEach(l => {
             const isIzan = l.author === "Izan";
             const initiale = l.author ? l.author[0] : '?';
             const dateStr = l.createdAt ? formatDate(l.createdAt) : '';
             const isAuthor = currentUser === l.author;
-
             const readBy = l.readBy || [];
             const recipient = l.author === "Izan" ? "Thalia" : "Izan";
-            const isReadByRecipient = readBy.includes(recipient);
-            const statusIcon = isReadByRecipient ? "❤️" : "♡";
-            let readDateHtml = (isReadByRecipient && l.readAt) ? `<div class="read-date">Lu le ${formatDate(l.readAt)}</div>` : "";
+            const isRead = readBy.includes(recipient);
+            const motif = l.motif || 'none';
+            const motifEmoji = MOTIF_EMOJI[motif] ? `<span class="motif-badge">${MOTIF_EMOJI[motif]}</span>` : '';
 
-            // Génération de l'affichage des réactions
             const reactions = l.reactions || {};
-            let reactionsHtml = "";
+            // Group reactions by emoji
+            const emojiGroups = {};
             for (const [user, emoji] of Object.entries(reactions)) {
-                reactionsHtml += `<span class="reaction-badge" title="${user} a réagi avec ${emoji}">${emoji}</span>`;
+                emojiGroups[emoji] = (emojiGroups[emoji] || []);
+                emojiGroups[emoji].push(user);
             }
+            let reactionsHtml = Object.entries(emojiGroups).map(([em, users]) =>
+                `<span class="reaction-badge" title="${users.join(', ')}">${em} ${users.length > 1 ? users.length : ''}</span>`
+            ).join('');
+
+            const myReaction = reactions[currentUser];
+            const canReact = !isAuthor;
+
+            const reactionBtns = EMOJIS.map(em =>
+                `<button class="reaction-btn${myReaction===em?' my-reaction':''}" onclick="addReaction('${l.id}','${em}')" ${canReact?'':'disabled'}>${em}</button>`
+            ).join('');
+
+            const disabledNote = !canReact ? `<span class="reaction-disabled">Propre lettre</span>` : '';
+
+            const hasPhotos = l.photos && l.photos.length > 0;
+            const photosIndicator = hasPhotos ? `<span style="font-size:12px;color:var(--ink-soft);margin-left:4px;">📷${l.photos.length}</span>` : '';
 
             const card = document.createElement('div');
             card.className = 'letter-card';
             card.innerHTML = `
                 <div class="letter-card-accent ${isIzan ? 'accent-izan' : 'accent-thalia'}"></div>
-                <div class="read-status-container"><div class="read-status-indicator">${statusIcon}</div>${readDateHtml}</div>
+                <div class="read-status-row">
+                    <span class="read-status-indicator">${isRead ? '❤️' : '♡'}</span>
+                    ${isRead && l.readAt ? `<span class="read-date">Lu le ${formatDate(l.readAt)}</span>` : ''}
+                </div>
                 <div class="letter-card-body">
                     <div class="letter-avatar ${isIzan ? 'avatar-izan' : 'avatar-thalia'}">${initiale}</div>
                     <div class="letter-info" onclick="window._openLetter('${l.id}')">
-                        <h3>${escHtml(l.title)}</h3>
+                        <h3>${escHtml(l.title)}${motifEmoji}${photosIndicator}</h3>
                         <p class="letter-meta">De ${escHtml(l.author)} · ${dateStr}</p>
                     </div>
-                    <div class="card-actions" style="display: ${isAuthor ? 'flex' : 'none'};">
-                        <button class="icon-btn btn-edit" title="Modifier" onclick="window._startEdit('${l.id}', event)">✏️</button>
-                        <button class="icon-btn btn-del" title="Supprimer" onclick="window._deleteLetter('${l.id}', event)">🗑️</button>
+                    <div class="card-actions" style="display:${isAuthor?'flex':'none'};">
+                        <button class="icon-btn" title="Modifier" onclick="window._startEdit('${l.id}',event)">✏️</button>
+                        <button class="icon-btn btn-del" title="Supprimer" onclick="window._deleteLetter('${l.id}',event)">🗑️</button>
                     </div>
                 </div>
                 <div class="reaction-bar">
-                    <span style="font-size: 12px; color: var(--ink-soft);">Réagir : </span>
-                    <button class="reaction-btn" onclick="addReaction('${l.id}', '❤️')">❤️</button>
-                    <button class="reaction-btn" onclick="addReaction('${l.id}', '🥺')">🥺</button>
-                    <button class="reaction-btn" onclick="addReaction('${l.id}', '😂')">😂</button>
-                    <button class="reaction-btn" onclick="addReaction('${l.id}', '✨')">✨</button>
+                    ${disabledNote}
+                    ${canReact ? `<span class="reaction-label">Réagir :</span>${reactionBtns}` : ''}
                     <div class="reaction-display">${reactionsHtml}</div>
                 </div>`;
             list.appendChild(card);
         });
     }
 
-    function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
+    // ── SAVE ──
     window.saveLetter = async function() {
         const title = document.getElementById('title').value.trim();
         const text = document.getElementById('content').value.trim();
-        const motif = document.getElementById('motif').value;
         if (!title || !text) return;
-
-        document.getElementById('submitBtn').disabled = true;
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Envoi en cours…';
         try {
+            const photos = uploadedPhotos.map(p => p.dataUrl); // Store base64 in Firestore
             if (editingId) {
-                await updateDoc(doc(db, "letters", editingId), { title, text, motif, editedAt: serverTimestamp() });
+                await updateDoc(doc(db, "letters", editingId), { title, text, motif: selectedMotif, photos, editedAt: serverTimestamp() });
             } else {
-                await addDoc(lettersCol, { title, text, motif, author: currentUser, createdAt: serverTimestamp(), readBy: [], readAt: null, reactions: {} });
+                await addDoc(lettersCol, { title, text, motif: selectedMotif, photos, author: currentUser, createdAt: serverTimestamp(), readBy: [], readAt: null, reactions: {} });
             }
             resetForm();
-        } catch(e) {} finally { document.getElementById('submitBtn').disabled = false; }
+        } catch(e) { console.error(e); } 
+        finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Sceller &amp; envoyer la lettre';
+        }
     };
 
     window._startEdit = function(id, event) {
-        event.stopPropagation(); const l = allLetters.find(x => x.id === id); if (!l || l.author !== currentUser) return; 
-        editingId = l.id; document.getElementById('title').value = l.title; document.getElementById('content').value = l.text;
-        document.getElementById('motif').value = l.motif || 'none'; document.getElementById('cancelEditBtn').style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' });
+        event.stopPropagation();
+        const l = allLetters.find(x => x.id === id);
+        if (!l || l.author !== currentUser) return;
+        editingId = l.id;
+        document.getElementById('title').value = l.title;
+        document.getElementById('content').value = l.text;
+        selectedMotif = l.motif || 'none';
+        // Update motif UI
+        document.querySelectorAll('.motif-option').forEach(o => {
+            o.classList.toggle('selected', o.dataset.motif === selectedMotif);
+        });
+        // Load photos
+        uploadedPhotos = (l.photos || []).map((d, i) => ({ dataUrl: d, name: `photo_${i}` }));
+        renderPhotoPreviews();
+        document.getElementById('cancelEditBtn').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    window.resetForm = function() { editingId = null; document.getElementById('title').value = ''; document.getElementById('content').value = ''; document.getElementById('motif').value = 'none'; document.getElementById('cancelEditBtn').style.display = 'none'; };
+    window.resetForm = function() {
+        editingId = null;
+        document.getElementById('title').value = '';
+        document.getElementById('content').value = '';
+        selectedMotif = 'none';
+        document.querySelectorAll('.motif-option').forEach(o => o.classList.toggle('selected', o.dataset.motif==='none'));
+        uploadedPhotos = [];
+        renderPhotoPreviews();
+        document.getElementById('cancelEditBtn').style.display = 'none';
+    };
 
     window._deleteLetter = async function(id, event) {
-        event.stopPropagation(); const l = allLetters.find(x => x.id === id); if (!l || l.author !== currentUser) return; 
-        if (confirm('Effacer définitivement ?')) { await deleteDoc(doc(db, "letters", id)); if (editingId === id) resetForm(); }
+        event.stopPropagation();
+        const l = allLetters.find(x => x.id === id);
+        if (!l || l.author !== currentUser) return;
+        if (confirm('Effacer définitivement cette lettre ?')) {
+            await deleteDoc(doc(db, "letters", id));
+            if (editingId === id) resetForm();
+        }
     };
 
     window._openLetter = async function(id) {
         activeLetter = allLetters.find(x => x.id === id);
         if (!activeLetter) return;
 
+        // Mark as read
         const readBy = activeLetter.readBy || [];
         if (activeLetter.author !== currentUser && !readBy.includes(currentUser)) {
             readBy.push(currentUser);
-            try { await updateDoc(doc(db, "letters", id), { readBy: readBy, readAt: serverTimestamp() }); } catch(e) {}
+            try { await updateDoc(doc(db, "letters", id), { readBy, readAt: serverTimestamp() }); } catch(e) {}
         }
 
+        const motif = activeLetter.motif || 'none';
         const sheet = document.getElementById('fullSheet');
-        // Application du motif de fond CSS
-        sheet.className = "a4-sheet pattern-" + (activeLetter.motif || 'none');
+        sheet.className = `a4-sheet motif-${motif}`;
 
         document.getElementById('sheetMeta').textContent = `Écrit par ${activeLetter.author} · ${formatDate(activeLetter.createdAt)}`;
         document.getElementById('sheetTitle').textContent = activeLetter.title;
         document.getElementById('sheetContent').textContent = activeLetter.text;
         document.getElementById('sheetFooter').textContent = `— ${activeLetter.author} ✦`;
-        document.getElementById('readerView').style.display = 'block'; document.body.style.overflow = 'hidden';
+
+        // Photos
+        const photosEl = document.getElementById('sheetPhotos');
+        photosEl.innerHTML = '';
+        (activeLetter.photos || []).forEach(dataUrl => {
+            const div = document.createElement('div');
+            div.className = 'sheet-photo';
+            div.innerHTML = `<img src="${dataUrl}" alt="photo">`;
+            photosEl.appendChild(div);
+        });
+
+        document.getElementById('readerView').style.display = 'block';
+        document.body.style.overflow = 'hidden';
     };
 
-    window.closeLetter = function() { document.getElementById('readerView').style.display = 'none'; document.body.style.overflow = ''; };
+    window.closeLetter = function() {
+        document.getElementById('readerView').style.display = 'none';
+        document.body.style.overflow = '';
+    };
 
     function initFirebaseListener() {
-        onSnapshot(query(lettersCol, orderBy("createdAt", "desc")), snap => {
+        onSnapshot(query(lettersCol, orderBy("createdAt","desc")), snap => {
             const letters = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            
-            // Système de notification (Si ce n'est pas le premier chargement et qu'il y a une nouvelle lettre)
             if (!isInitialLoad && letters.length > allLetters.length) {
-                const newestLetter = letters[0];
-                if (newestLetter.author !== currentUser) {
-                    sendNotification(`💌 Nouveau mot de ${newestLetter.author}`, newestLetter.title);
+                const newest = letters[0];
+                if (newest.author !== currentUser) {
+                    sendNotification(`💌 Nouveau mot de ${newest.author}`, newest.title);
                 }
             }
             isInitialLoad = false;
@@ -452,7 +925,7 @@
     }
 
     window.checkUser();
-    if (currentUser) { initFirebaseListener(); }
+    if (currentUser) initFirebaseListener();
 </script>
 </body>
 </html>
