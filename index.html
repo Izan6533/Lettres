@@ -428,21 +428,139 @@
         }
         .sheet-photo img { display: block; width: 180px; height: 140px; object-fit: cover; }
 
-        /* ── PRINT ── */
+        /* ── WORD COUNTER ── */
+        .word-counter {
+            text-align: right; font-size: 12px; color: var(--gold);
+            margin-top: 4px; font-style: italic; transition: color 0.3s;
+        }
+        .word-counter.long { color: var(--bordeaux); }
+
+        /* ── CONFETTI ── */
+        .confetto {
+            position: fixed; pointer-events: none; z-index: 9999;
+            width: 8px; height: 8px; border-radius: 2px;
+            animation: confetti-fall 1.4s ease-in forwards;
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* ── BIBLE VERSE DU JOUR ── */
+        .bible-verse-card {
+            background: linear-gradient(145deg, #FFFAF5 0%, #FFF0F5 60%, #FFF8EE 100%);
+            border: 1px solid var(--rose-dk);
+            border-left: 4px solid var(--bordeaux);
+            border-radius: 12px;
+            padding: 18px 20px 14px 22px;
+            margin: 0 0 22px;
+            position: relative; overflow: hidden;
+        }
+        .bible-verse-card::after {
+            content: '✝';
+            position: absolute; bottom: -10px; right: 14px;
+            font-size: 52px; color: var(--rose-dk);
+            font-family: Georgia, serif; line-height: 1; pointer-events: none;
+        }
+        .bible-verse-tag {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+            color: white; background: var(--bordeaux);
+            padding: 3px 10px; border-radius: 20px;
+            margin-bottom: 10px; font-family: 'EB Garamond', serif;
+        }
+        .bible-verse-tag.tag-famille { background: #7B5EA7; }
+        .bible-verse-tag.tag-foi { background: #2E7D6E; }
+        .bible-verse-text {
+            font-family: 'Cormorant Garamond', serif; font-style: italic;
+            font-size: 17px; color: var(--ink); line-height: 1.65;
+            position: relative; z-index: 1;
+        }
+        .bible-verse-text::before {
+            content: '\201C'; font-size: 38px; color: var(--bordeaux);
+            opacity: 0.25; line-height: 0; vertical-align: -14px;
+            margin-right: 3px; font-family: Georgia, serif;
+        }
+        .bible-verse-ref {
+            display: block; margin-top: 10px; font-size: 12px;
+            color: var(--bordeaux); letter-spacing: 0.08em;
+            font-family: 'EB Garamond', serif; font-weight: 500;
+            position: relative; z-index: 1;
+        }
+        .bible-verse-nav {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 10px; position: relative; z-index: 1;
+        }
+        .bible-verse-nav-btn {
+            background: none; border: 1px solid var(--ivory-dk);
+            border-radius: 20px; padding: 4px 12px; cursor: pointer;
+            font-size: 12px; color: var(--ink-soft); font-family: 'EB Garamond', serif;
+            transition: background 0.2s;
+        }
+        .bible-verse-nav-btn:hover { background: var(--rose); border-color: var(--rose-dk); }
+        .bible-verse-counter { font-size: 11px; color: var(--gold); font-style: italic; }
+
+        /* ── LETTER SEAL ANIMATION ── */
+        @keyframes seal-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+            100% { transform: scale(1); }
+        }
+        .seal-btn:active { animation: seal-pulse 0.3s ease; }
+
+        /* ── NEW LETTER PULSE on card ── */
+        @keyframes new-letter-glow {
+            0% { box-shadow: 0 0 0 0 rgba(212,105,154,0.5); }
+            70% { box-shadow: 0 0 0 12px rgba(212,105,154,0); }
+            100% { box-shadow: 0 0 0 0 rgba(212,105,154,0); }
+        }
+        .letter-card.is-new { animation: new-letter-glow 1.8s ease 3; }
         @media print {
+            @page { margin: 20mm; size: A4; }
+            html, body { height: auto !important; overflow: visible !important; }
             body * { visibility: hidden; }
-            #readerView, #readerView * { visibility: visible; }
+            #readerView { visibility: visible !important; }
+            #readerView * { visibility: visible !important; }
             #readerView {
-                position: fixed; inset: 0; background: white;
-                backdrop-filter: none; padding: 0; overflow: visible;
+                position: absolute !important; top: 0; left: 0;
+                width: 100% !important; height: auto !important;
+                background: white !important; backdrop-filter: none !important;
+                padding: 0 !important; overflow: visible !important;
+                display: block !important;
             }
             .reader-topbar { display: none !important; }
             .a4-sheet {
-                box-shadow: none; width: 100%; max-width: 100%;
-                margin: 0; padding: 40px; border-radius: 0;
-                border: none !important;
+                box-shadow: none !important;
+                width: 100% !important; max-width: 100% !important;
+                min-height: auto !important;
+                margin: 0 !important; padding: 0 !important;
+                border-radius: 0 !important; border: none !important;
+                /* Crucial: allow natural page breaks */
+                overflow: visible !important;
+                height: auto !important;
             }
-            .pattern-layer { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            /* Pattern layer must repeat across all printed pages */
+            .pattern-layer {
+                position: fixed !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            /* All sheet content must flow naturally */
+            .sheet-meta, .sheet-title, .sheet-content,
+            .sheet-photos, .sheet-footer {
+                position: static !important;
+                overflow: visible !important;
+                page-break-inside: avoid;
+            }
+            .sheet-content {
+                page-break-inside: auto !important;
+                white-space: pre-wrap !important;
+                overflow: visible !important;
+                height: auto !important;
+                max-height: none !important;
+            }
+            .sheet-photo img { max-width: 160px; height: auto; page-break-inside: avoid; }
+            .sheet-photos { page-break-inside: avoid; }
         }
     </style>
 </head>
@@ -491,7 +609,8 @@
         </div>
         <div class="field-group">
             <label>Ta lettre</label>
-            <textarea id="content" placeholder="Laisse ton cœur parler…"></textarea>
+            <textarea id="content" placeholder="Laisse ton cœur parler…" oninput="updateWordCount()"></textarea>
+            <div class="word-counter" id="wordCounter">0 mot</div>
         </div>
 
         <!-- MOTIF SELECTOR -->
@@ -540,6 +659,16 @@
 
     <!-- ── LISTE ── -->
     <section class="history-section">
+        <div id="bibleVerseCard" class="bible-verse-card">
+            <div class="bible-verse-tag" id="bibleVerseTag">❤️ Amour</div>
+            <div class="bible-verse-text" id="bibleVerseText"></div>
+            <span class="bible-verse-ref" id="bibleVerseRef"></span>
+            <div class="bible-verse-nav">
+                <button class="bible-verse-nav-btn" onclick="prevVerse()">← Précédent</button>
+                <span class="bible-verse-counter" id="bibleVerseCounter"></span>
+                <button class="bible-verse-nav-btn" onclick="nextVerse()">Suivant →</button>
+            </div>
+        </div>
         <div id="typingIndicator" class="typing-indicator" style="display:none;">
             ✍️ <span id="typingName">Quelqu'un</span> est en train d'écrire<span class="typing-dots">...</span>
         </div>
@@ -594,6 +723,104 @@
         lettersCol = collection(db, "letters");
         statusDoc = doc(db, "status", "typing");
     } catch(e) { usingLocal = true; }
+
+    // ── WORD COUNTER ──
+    window.updateWordCount = function() {
+        const text = document.getElementById('content').value.trim();
+        const words = text ? text.split(/\s+/).length : 0;
+        const el = document.getElementById('wordCounter');
+        el.textContent = words + ' mot' + (words > 1 ? 's' : '');
+        el.classList.toggle('long', words > 200);
+    };
+
+    // ── CONFETTI ──
+    function launchConfetti() {
+        const colors = ['#C0392B','#D4699A','#C9A96E','#F2D0DF','#8B2252','#EDD9A8'];
+        const shapes = ['❤️','🌸','✨','💗','⭐'];
+        for (let i = 0; i < 40; i++) {
+            setTimeout(() => {
+                const el = document.createElement('div');
+                const useEmoji = Math.random() > 0.5;
+                if (useEmoji) {
+                    el.style.cssText = `position:fixed;pointer-events:none;z-index:9999;font-size:${14+Math.random()*10}px;left:${Math.random()*100}%;top:-20px;animation:confetti-fall ${1+Math.random()*0.8}s ease-in forwards;`;
+                    el.textContent = shapes[Math.floor(Math.random()*shapes.length)];
+                } else {
+                    el.className = 'confetto';
+                    el.style.cssText = `left:${Math.random()*100}%;top:-10px;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${1+Math.random()*0.6}s;animation-delay:${Math.random()*0.4}s;`;
+                }
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 2200);
+            }, i * 30);
+        }
+    }
+
+    // ── VERSETS BIBLIQUES DU JOUR ──
+    const BIBLE_VERSES = [
+        // ❤️ AMOUR
+        { text: "Car Dieu a tant aimé le monde qu'il a donné son Fils unique, afin que quiconque croit en lui ne périsse point, mais qu'il ait la vie éternelle.", ref: "Jean 3:16", theme: "amour" },
+        { text: "L'amour est patient, l'amour est serviable, il n'est pas envieux, il ne se vante pas, il ne s'enfle pas d'orgueil.", ref: "1 Corinthiens 13:4", theme: "amour" },
+        { text: "Bien-aimés, aimons-nous les uns les autres, car l'amour vient de Dieu, et quiconque aime est né de Dieu et connaît Dieu.", ref: "1 Jean 4:7", theme: "amour" },
+        { text: "Nous, nous l'aimons, parce qu'il nous a aimés le premier.", ref: "1 Jean 4:19", theme: "amour" },
+        { text: "Il n'y a pas de plus grand amour que de donner sa vie pour ses amis.", ref: "Jean 15:13", theme: "amour" },
+        { text: "Que votre amour soit sans hypocrisie. Ayez le mal en horreur ; attachez-vous fortement au bien.", ref: "Romains 12:9", theme: "amour" },
+        { text: "Supportez-vous les uns les autres, et pardonnez-vous réciproquement, si l'un a sujet de se plaindre de l'autre. De même que Christ vous a pardonné, pardonnez-vous aussi.", ref: "Colossiens 3:13", theme: "amour" },
+        { text: "Aimez-vous les uns les autres d'un amour fraternel ; rivalisez d'estime réciproque.", ref: "Romains 12:10", theme: "amour" },
+        { text: "Par-dessus tout cela, revêtez-vous de la charité, qui est le lien de la perfection.", ref: "Colossiens 3:14", theme: "amour" },
+        { text: "L'amour ne fait point de mal au prochain : l'amour est donc l'accomplissement de la loi.", ref: "Romains 13:10", theme: "amour" },
+        // 🏠 FAMILLE
+        { text: "Honore ton père et ta mère, afin que tes jours soient prolongés sur la terre que l'Éternel, ton Dieu, te donne.", ref: "Exode 20:12", theme: "famille" },
+        { text: "La maison et les richesses sont un héritage des pères, mais une femme prudente est un don de l'Éternel.", ref: "Proverbes 19:14", theme: "famille" },
+        { text: "Quant à moi et à ma maison, nous servirons l'Éternel.", ref: "Josué 24:15", theme: "famille" },
+        { text: "Les enfants sont un héritage de l'Éternel, le fruit du sein est une récompense.", ref: "Psaumes 127:3", theme: "famille" },
+        { text: "Que la paix de Christ règne dans vos cœurs, elle à laquelle vous avez été appelés pour former un seul corps.", ref: "Colossiens 3:15", theme: "famille" },
+        { text: "Femmes, soyez soumises à vos maris, comme il convient dans le Seigneur. Maris, aimez vos femmes et ne vous aigrissez pas contre elles.", ref: "Colossiens 3:18-19", theme: "famille" },
+        { text: "Que chacun de vous aime sa femme comme lui-même, et que la femme respecte son mari.", ref: "Éphésiens 5:33", theme: "famille" },
+        { text: "La femme vertueuse est la couronne de son mari.", ref: "Proverbes 12:4", theme: "famille" },
+        { text: "Instructe l'enfant selon la voie qu'il doit suivre ; et quand il sera vieux, il ne s'en détournera pas.", ref: "Proverbes 22:6", theme: "famille" },
+        { text: "Deux valent mieux qu'un, parce qu'ils retirent un bon salaire de leur travail.", ref: "Ecclésiaste 4:9", theme: "famille" },
+        // ✝️ FOI
+        { text: "Je puis tout par celui qui me fortifie.", ref: "Philippiens 4:13", theme: "foi" },
+        { text: "Confie-toi en l'Éternel de tout ton cœur, et ne t'appuie pas sur ta sagesse ; reconnais-le dans toutes tes voies, et il aplanira tes sentiers.", ref: "Proverbes 3:5-6", theme: "foi" },
+        { text: "Car je connais les projets que j'ai formés sur vous, dit l'Éternel, projets de paix et non de malheur, afin de vous donner un avenir et de l'espérance.", ref: "Jérémie 29:11", theme: "foi" },
+        { text: "L'Éternel est mon berger : je ne manquerai de rien.", ref: "Psaumes 23:1", theme: "foi" },
+        { text: "Cherchez premièrement le royaume et la justice de Dieu ; et toutes ces choses vous seront données par-dessus.", ref: "Matthieu 6:33", theme: "foi" },
+        { text: "Ne crains rien, car je suis avec toi ; ne promène pas des regards inquiets, car je suis ton Dieu.", ref: "Ésaïe 41:10", theme: "foi" },
+        { text: "La foi est une ferme assurance des choses qu'on espère, une démonstration de celles qu'on ne voit pas.", ref: "Hébreux 11:1", theme: "foi" },
+        { text: "Remets ton sort à l'Éternel, mets en lui ta confiance, et il agira.", ref: "Psaumes 37:5", theme: "foi" },
+        { text: "Heureux ceux qui ont le cœur pur, car ils verront Dieu.", ref: "Matthieu 5:8", theme: "foi" },
+        { text: "Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos.", ref: "Matthieu 11:28", theme: "foi" },
+    ];
+
+    const THEME_CONFIG = {
+        amour:   { label: "❤️ Amour",   cls: "",              color: "var(--bordeaux)" },
+        famille: { label: "🏠 Famille", cls: "tag-famille",   color: "#7B5EA7" },
+        foi:     { label: "✝️ Foi",      cls: "tag-foi",       color: "#2E7D6E" },
+    };
+
+    // Index du verset du jour = basé sur la date, puis navigable manuellement
+    let currentVerseIdx = Math.floor(Date.now() / 86400000) % BIBLE_VERSES.length;
+
+    function renderVerse() {
+        const v = BIBLE_VERSES[currentVerseIdx];
+        const cfg = THEME_CONFIG[v.theme];
+        const tag = document.getElementById('bibleVerseTag');
+        tag.textContent = cfg.label;
+        tag.className = 'bible-verse-tag ' + cfg.cls;
+        document.getElementById('bibleVerseCard').style.borderLeftColor = cfg.color;
+        document.getElementById('bibleVerseText').textContent = v.text;
+        document.getElementById('bibleVerseRef').textContent = '— ' + v.ref;
+        document.getElementById('bibleVerseCounter').textContent =
+            `${currentVerseIdx + 1} / ${BIBLE_VERSES.length}`;
+    }
+    window.prevVerse = function() {
+        currentVerseIdx = (currentVerseIdx - 1 + BIBLE_VERSES.length) % BIBLE_VERSES.length;
+        renderVerse();
+    };
+    window.nextVerse = function() {
+        currentVerseIdx = (currentVerseIdx + 1) % BIBLE_VERSES.length;
+        renderVerse();
+    };
+    renderVerse();
 
     // ── MOTIF SELECTION ──
     window.selectMotif = function(motif, el) {
@@ -750,6 +977,7 @@
             const isIzan = l.author === "Izan";
             const initiale = l.author ? l.author[0] : '?';
             const dateStr = l.createdAt ? formatDate(l.createdAt) : '';
+            const editedStr = l.editedAt ? ` · ✏️ modifié le ${formatDate(l.editedAt)}` : '';
             const isAuthor = currentUser === l.author;
             const readBy = l.readBy || [];
             const recipient = l.author === "Izan" ? "Thalia" : "Izan";
@@ -781,7 +1009,8 @@
             const photosIndicator = hasPhotos ? `<span style="font-size:12px;color:var(--ink-soft);margin-left:4px;">📷${l.photos.length}</span>` : '';
 
             const card = document.createElement('div');
-            card.className = 'letter-card';
+            const isNew = !isAuthor && !isRead && l.createdAt && (Date.now() - (l.createdAt.toDate ? l.createdAt.toDate() : new Date(l.createdAt)).getTime() < 3600000);
+            card.className = 'letter-card' + (isNew ? ' is-new' : '');
             card.innerHTML = `
                 <div class="letter-card-accent ${isIzan ? 'accent-izan' : 'accent-thalia'}"></div>
                 <div class="read-status-row">
@@ -792,7 +1021,7 @@
                     <div class="letter-avatar ${isIzan ? 'avatar-izan' : 'avatar-thalia'}">${initiale}</div>
                     <div class="letter-info" onclick="window._openLetter('${l.id}')">
                         <h3>${escHtml(l.title)}${motifEmoji}${photosIndicator}</h3>
-                        <p class="letter-meta">De ${escHtml(l.author)} · ${dateStr}</p>
+                        <p class="letter-meta">De ${escHtml(l.author)} · ${dateStr}${editedStr}</p>
                     </div>
                     <div class="card-actions" style="display:${isAuthor?'flex':'none'};">
                         <button class="icon-btn" title="Modifier" onclick="window._startEdit('${l.id}',event)">✏️</button>
@@ -824,6 +1053,7 @@
                 await addDoc(lettersCol, { title, text, motif: selectedMotif, photos, author: currentUser, createdAt: serverTimestamp(), readBy: [], readAt: null, reactions: {} });
             }
             resetForm();
+            launchConfetti();
         } catch(e) { console.error(e); } 
         finally {
             submitBtn.disabled = false;
@@ -886,7 +1116,9 @@
         const sheet = document.getElementById('fullSheet');
         sheet.className = `a4-sheet motif-${motif}`;
 
-        document.getElementById('sheetMeta').textContent = `Écrit par ${activeLetter.author} · ${formatDate(activeLetter.createdAt)}`;
+        document.getElementById('sheetMeta').innerHTML = 
+            `Écrit par <strong>${activeLetter.author}</strong> · ${formatDate(activeLetter.createdAt)}`
+            + (activeLetter.editedAt ? `<span style="margin-left:12px;opacity:0.7;font-size:11px;">✏️ Modifié le ${formatDate(activeLetter.editedAt)}</span>` : '');
         document.getElementById('sheetTitle').textContent = activeLetter.title;
         document.getElementById('sheetContent').textContent = activeLetter.text;
         document.getElementById('sheetFooter').textContent = `— ${activeLetter.author} ✦`;
