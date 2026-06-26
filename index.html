@@ -954,20 +954,88 @@
         preview.style.display = 'none';
         pendingVerseData = null;
 
-        try {
-            // bible-api.com supporte LSG (Louis Segond) — toute la Bible
-            const res = await fetch(`https://bible-api.com/${encodeURIComponent(q)}?translation=lsg`);
-            if (!res.ok) throw new Error('not found');
-            const data = await res.json();
-            if (!data.text) throw new Error('empty');
+        // Normalise la référence : "Jean 3:16" → "jean+3:16"
+        // On essaie plusieurs proxies/APIs pour contourner le CORS de github.io
+        const normalized = q.trim();
 
-            pendingVerseData = { text: data.text.trim(), ref: data.reference };
-            document.getElementById('previewText').textContent = data.text.trim();
-            document.getElementById('previewRef').textContent = '— ' + data.reference;
+        // Correspondance des noms de livres FR → EN pour l'API anglophone
+        const frToEn = {
+            'genèse':'genesis','exode':'exodus','lévitique':'leviticus','nombres':'numbers',
+            'deutéronome':'deuteronomy','josué':'joshua','juges':'judges','ruth':'ruth',
+            '1 samuel':'1samuel','2 samuel':'2samuel','1 rois':'1kings','2 rois':'2kings',
+            '1 chroniques':'1chronicles','2 chroniques':'2chronicles','esdras':'ezra',
+            'néhémie':'nehemiah','esther':'esther','job':'job','psaumes':'psalms','psaume':'psalms',
+            'proverbes':'proverbs','ecclésiaste':'ecclesiastes','cantique':'songofsolomon',
+            'ésaïe':'isaiah','jérémie':'jeremiah','lamentations':'lamentations',
+            'ézéchiel':'ezekiel','daniel':'daniel','osée':'hosea','joël':'joel',
+            'amos':'amos','abdias':'obadiah','jonas':'jonah','michée':'micah',
+            'nahoum':'nahum','habacuc':'habakkuk','sophonie':'zephaniah','aggée':'haggai',
+            'zacharie':'zechariah','malachie':'malachi',
+            'matthieu':'matthew','matt':'matthew','marc':'mark','luc':'luke','jean':'john',
+            'actes':'acts','romains':'romans','1 corinthiens':'1corinthians',
+            '2 corinthiens':'2corinthians','galates':'galatians','éphésiens':'ephesians',
+            'philippiens':'philippians','colossiens':'colossians',
+            '1 thessaloniciens':'1thessalonians','2 thessaloniciens':'2thessalonians',
+            '1 timothée':'1timothy','2 timothée':'2timothy','tite':'titus',
+            'philémon':'philemon','hébreux':'hebrews','jacques':'james',
+            '1 pierre':'1peter','2 pierre':'2peter','1 jean':'1john','2 jean':'2john',
+            '3 jean':'3john','jude':'jude','apocalypse':'revelation'
+        };
+
+        function translateRef(ref) {
+            const lower = ref.toLowerCase().trim();
+            for (const [fr, en] of Object.entries(frToEn)) {
+                if (lower.startsWith(fr)) {
+                    return en + ref.slice(fr.length);
+                }
+            }
+            return ref; // déjà en anglais peut-être
+        }
+
+        async function tryFetch(url) {
+            const res = await fetch(url, { mode: 'cors' });
+            if (!res.ok) throw new Error(res.status);
+            return res.json();
+        }
+
+        try {
+            const enRef = translateRef(normalized);
+
+            // API 1 : api.esv.org (anglais seulement, on l'utilise pour les refs)
+            // API 2 : cdn.jsdelivr.net proxy vers bible-api (CORS libre)
+            // API 3 : corsproxy.io → bible-api.com
+
+            let text = null, refOut = null;
+
+            // Essai 1 : proxy CORS public vers bible-api.com
+            const proxyUrls = [
+                `https://corsproxy.io/?${encodeURIComponent('https://bible-api.com/' + encodeURIComponent(normalized) + '?translation=lsg')}`,
+                `https://api.allorigins.win/get?url=${encodeURIComponent('https://bible-api.com/' + encodeURIComponent(normalized) + '?translation=lsg')}`,
+            ];
+
+            for (const url of proxyUrls) {
+                try {
+                    const data = await tryFetch(url);
+                    // allorigins renvoie { contents: "..." }
+                    const parsed = data.contents ? JSON.parse(data.contents) : data;
+                    if (parsed && parsed.text) {
+                        text = parsed.text.trim();
+                        refOut = parsed.reference;
+                        break;
+                    }
+                } catch(_) { continue; }
+            }
+
+            if (!text) throw new Error('all failed');
+
+            pendingVerseData = { text, ref: refOut || normalized };
+            document.getElementById('previewText').textContent = text;
+            document.getElementById('previewRef').textContent = '— ' + (refOut || normalized);
             document.getElementById('verseComment').value = '';
             preview.style.display = 'block';
+
         } catch(e) {
-            document.getElementById('previewText').textContent = '⚠️ Verset introuvable. Essaie : Jean 3:16 · Psaumes 23 · 1 Corinthiens 13:4';
+            document.getElementById('previewText').textContent = '⚠️ Verset introuvable ou erreur réseau. Essaie : Jean 3:16 · Psaumes 23 · 1 Corinthiens 13:4 · Philippiens 4:13';
             document.getElementById('previewRef').textContent = '';
             preview.style.display = 'block';
         } finally {
