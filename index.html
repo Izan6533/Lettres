@@ -509,6 +509,7 @@
         }
         .verse-space-header span { font-size: 20px; }
         .verse-search-area { padding: 14px 16px; border-bottom: 1px solid var(--ivory-dk); background: var(--ivory); }
+        .verse-search-area { padding: 14px 16px; border-bottom: 1px solid var(--ivory-dk); background: var(--ivory); }
         .verse-search-row { display: flex; gap: 8px; }
         .verse-search-row input {
             flex-grow: 1; padding: 9px 13px; border: 1px solid var(--ivory-dk);
@@ -641,17 +642,14 @@
                 min-height: auto !important;
                 margin: 0 !important; padding: 0 !important;
                 border-radius: 0 !important; border: none !important;
-                /* Crucial: allow natural page breaks */
                 overflow: visible !important;
                 height: auto !important;
             }
-            /* Pattern layer must repeat across all printed pages */
             .pattern-layer {
                 position: fixed !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
-            /* All sheet content must flow naturally */
             .sheet-meta, .sheet-title, .sheet-content,
             .sheet-photos, .sheet-footer {
                 position: static !important;
@@ -725,19 +723,19 @@
                     <span>Aucun</span>
                 </div>
                 <div class="motif-option" data-motif="hearts" onclick="selectMotif('hearts', this)">
-                    <div class="motif-preview-bg" style="background-image:url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='5' y='22' font-size='16' opacity='0.4'%3E%E2%9D%A4%3C/text%3E%3C/svg%3E\");background-size:30px;"></div>
+                    <div class="motif-preview-bg" style="background-image:url('data:image/svg+xml,%3Csvg width=%2230%22 height=%2230%22 viewBox=%220 0 30 30%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ctext x=%225%22 y=%2222%22 font-size=%2216%22 opacity=%220.4%22%3E%E2%9D%A4%3C/text%3E%3C/svg%3E');background-size:30px;"></div>
                     ❤️<span>Cœurs</span>
                 </div>
                 <div class="motif-option" data-motif="flowers" onclick="selectMotif('flowers', this)">
-                    <div class="motif-preview-bg" style="background-image:url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='3' y='22' font-size='16' opacity='0.4'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E\");background-size:30px;"></div>
+                    <div class="motif-preview-bg" style="background-image:url('data:image/svg+xml,%3Csvg width=%2230%22 height=%2230%22 viewBox=%220 0 30 30%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ctext x=%223%22 y=%2222%22 font-size=%2216%22 opacity=%220.4%22%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E');background-size:30px;"></div>
                     🌸<span>Fleurs</span>
                 </div>
                 <div class="motif-option" data-motif="stars" onclick="selectMotif('stars', this)">
-                    <div class="motif-preview-bg" style="background-image:url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='4' y='22' font-size='16' opacity='0.4'%3E%E2%9C%A8%3C/text%3E%3C/svg%3E\");background-size:30px;"></div>
+                    <div class="motif-preview-bg" style="background-image:url('data:image/svg+xml,%3Csvg width=%2230%22 height=%2230%22 viewBox=%220 0 30 30%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ctext x=%224%22 y=%2222%22 font-size=%2216%22 opacity=%220.4%22%3E%E2%9C%A8%3C/text%3E%3C/svg%3E');background-size:30px;"></div>
                     ✨<span>Étoiles</span>
                 </div>
                 <div class="motif-option" data-motif="vintage" onclick="selectMotif('vintage', this)">
-                    <div class="motif-preview-bg" style="background-image:url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='4' y='22' font-size='14' opacity='0.3'%3E%F0%9F%93%9C%3C/text%3E%3C/svg%3E\");background-size:30px;"></div>
+                    <div class="motif-preview-bg" style="background-image:url('data:image/svg+xml,%3Csvg width=%2230%22 height=%2230%22 viewBox=%220 0 30 30%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ctext x=%224%22 y=%2222%22 font-size=%2214%22 opacity=%220.3%22%3E%F0%9F%93%9C%3C/text%3E%3C/svg%3E');background-size:30px;"></div>
                     📜<span>Ancien</span>
                 </div>
             </div>
@@ -843,14 +841,13 @@
         const app = initializeApp(FIREBASE_CONFIG);
         db = getFirestore(app);
         lettersCol = collection(db, "letters");
-        photosCol  = collection(db, "photos");   // collection séparée pour les photos
+        photosCol  = collection(db, "photos");
         statusDoc  = doc(db, "status", "typing");
     } catch(e) {
         console.error('Firebase init échoué :', e);
         usingLocal = true;
     }
 
-    // ── WORD COUNTER ──
     window.updateWordCount = function() {
         const text = document.getElementById('content').value.trim();
         const words = text ? text.split(/\s+/).length : 0;
@@ -859,7 +856,6 @@
         el.classList.toggle('long', words > 200);
     };
 
-    // ── CONFETTI ──
     function launchConfetti() {
         const colors = ['#C0392B','#D4699A','#C9A96E','#F2D0DF','#8B2252','#EDD9A8'];
         const shapes = ['❤️','🌸','✨','💗','⭐'];
@@ -880,7 +876,6 @@
         }
     }
 
-    // ── VERSET DU JOUR (30 versets fixes, 1 par jour) ──
     const BIBLE_VERSES = [
         { text: "Car Dieu a tant aimé le monde qu'il a donné son Fils unique, afin que quiconque croit en lui ne périsse point, mais qu'il ait la vie éternelle.", ref: "Jean 3:16", theme: "amour" },
         { text: "L'amour est patient, l'amour est serviable, il n'est pas envieux, il ne se vante pas, il ne s'enfle pas d'orgueil.", ref: "1 Corinthiens 13:4", theme: "amour" },
@@ -928,15 +923,12 @@
     document.getElementById('bibleVerseRef').textContent = '— ' + todayVerse.ref;
     document.getElementById('bibleVerseDay').textContent = '✦ Parole du ' + new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
 
-    // ── ESPACE VERSETS PARTAGÉS ──
-    // Stocké dans Firestore : collection "sharedVerses"
     let sharedVersesCol;
     let allSharedVerses = [];
-    let pendingVerseData = null; // verset récupéré via API, en attente d'être partagé
+    let pendingVerseData = null;
 
     try { sharedVersesCol = collection(db, "sharedVerses"); } catch(_) {}
 
-    // Chercher un verset via l'API bible-api.com
     window.searchAndPreview = async function() {
         const q = document.getElementById('bibleSearchQuery').value.trim();
         if (!q) return;
@@ -948,7 +940,6 @@
 
         const normalized = q.trim();
 
-        // Correspondance des noms de livres FR → EN pour l'API anglophone
         const frToEn = {
             'genese':'genesis','genèse':'genesis','exode':'exodus','levitique':'leviticus','lévitique':'leviticus',
             'nombres':'numbers','deuteronome':'deuteronomy','deutéronome':'deuteronomy','josue':'joshua','josué':'joshua',
@@ -980,13 +971,10 @@
 
         try {
             const enRef = translateRef(normalized);
-            
-            // L'API bible-api.com gère déjà le CORS, on l'appelle directement avec le nom du livre en anglais
             const apiUrl = `https://bible-api.com/${encodeURIComponent(enRef)}?translation=lsg`;
             const response = await fetch(apiUrl);
             
             if (!response.ok) throw new Error("Verset introuvable");
-            
             const data = await response.json();
             
             if (data && data.text) {
@@ -998,7 +986,6 @@
             } else {
                 throw new Error("Erreur de format");
             }
-
         } catch(e) {
             document.getElementById('previewText').textContent = '⚠️ Verset introuvable. Essaie : Jean 3:16 · Psaumes 23:1 · 1 Corinthiens 13:4';
             document.getElementById('previewRef').textContent = '';
@@ -1008,7 +995,6 @@
         }
     };
 
-    // Partager le verset trouvé dans Firestore
     window.shareVerse = async function() {
         if (!pendingVerseData || !currentUser) return;
         const comment = document.getElementById('verseComment').value.trim();
@@ -1021,14 +1007,12 @@
                 sharedAt: serverTimestamp(),
                 replies: []
             });
-            // Reset
             document.getElementById('versePreview').style.display = 'none';
             document.getElementById('bibleSearchQuery').value = '';
             pendingVerseData = null;
         } catch(e) { console.error('Erreur partage verset:', e); }
     };
 
-    // Ajouter une réponse à un verset partagé
     window.sendVerseReply = async function(verseId) {
         const input = document.getElementById('reply-' + verseId);
         if (!input) return;
@@ -1043,13 +1027,11 @@
         } catch(e) { console.error(e); }
     };
 
-    // Supprimer un verset partagé
     window.deleteSharedVerse = async function(verseId) {
         if (!confirm('Supprimer ce verset partagé ?')) return;
         try { await deleteDoc(doc(sharedVersesCol, verseId)); } catch(e) {}
     };
 
-    // Afficher/cacher le formulaire de réponse
     window.toggleReplyForm = function(verseId) {
         const form = document.getElementById('replyForm-' + verseId);
         if (form) form.style.display = form.style.display === 'none' ? 'flex' : 'none';
@@ -1099,7 +1081,6 @@
         });
     }
 
-    // Listener temps réel pour les versets partagés
     function initSharedVersesListener() {
         if (!sharedVersesCol) return;
         onSnapshot(query(sharedVersesCol, orderBy("sharedAt", "desc")), snap => {
@@ -1107,14 +1088,12 @@
         });
     }
 
-    // ── MOTIF SELECTION ──
     window.selectMotif = function(motif, el) {
         selectedMotif = motif;
         document.querySelectorAll('.motif-option').forEach(o => o.classList.remove('selected'));
         el.classList.add('selected');
     };
 
-    // ── PHOTO UPLOAD ──
     window.handlePhotos = function(e) {
         const files = Array.from(e.target.files);
         const remaining = 5 - uploadedPhotos.length;
@@ -1142,7 +1121,6 @@
             preview.appendChild(thumb);
         });
         count.textContent = uploadedPhotos.length > 0 ? `${uploadedPhotos.length}/5 photo${uploadedPhotos.length>1?'s':''}` : '';
-        // Update upload zone hint
         const zone = document.querySelector('.photo-upload-sub');
         if (uploadedPhotos.length >= 5) zone.textContent = 'Maximum atteint (5/5)';
         else zone.textContent = `Galerie, appareil photo ou fichiers · ${5-uploadedPhotos.length} restante${5-uploadedPhotos.length>1?'s':''}`;
@@ -1153,7 +1131,6 @@
         renderPhotoPreviews();
     };
 
-    // ── AUTH ──
     function requestNotifications() {
         if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
             Notification.requestPermission();
@@ -1187,7 +1164,6 @@
         localStorage.removeItem('letter_user'); currentUser = null; window.checkUser();
     };
 
-    // ── TYPING INDICATOR ──
     let typingTimeout;
     [document.getElementById('title'), document.getElementById('content')].forEach(el => {
         el.addEventListener('input', () => {
@@ -1215,7 +1191,6 @@
         });
     }
 
-    // ── REACTIONS ──
     const EMOJIS = ['❤️','🥺','😂','✨','🫶'];
     const MOTIF_EMOJI = { none:'', hearts:'❤️', flowers:'🌸', stars:'✨', vintage:'📜' };
 
@@ -1223,11 +1198,9 @@
         if (usingLocal) return;
         const l = allLetters.find(x => x.id === letterId);
         if (!l) return;
-        // Cannot react to own letters
         if (l.author === currentUser) return;
 
         let reactions = { ...(l.reactions || {}) };
-        // Toggle: if same emoji already selected, remove it
         if (reactions[currentUser] === emoji) {
             delete reactions[currentUser];
         } else {
@@ -1238,7 +1211,6 @@
         } catch(e) { console.error(e); }
     };
 
-    // ── RENDER ──
     function formatDate(ts) {
         if (!ts) return "";
         const d = ts.toDate ? ts.toDate() : new Date(ts);
@@ -1246,7 +1218,7 @@
     }
 
     function escHtml(str) {
-        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&quot;');
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
 
     function renderLetters(letters) {
@@ -1272,7 +1244,6 @@
             const motifEmoji = MOTIF_EMOJI[motif] ? `<span class="motif-badge">${MOTIF_EMOJI[motif]}</span>` : '';
 
             const reactions = l.reactions || {};
-            // Group reactions by emoji
             const emojiGroups = {};
             for (const [user, emoji] of Object.entries(reactions)) {
                 emojiGroups[emoji] = (emojiGroups[emoji] || []);
@@ -1290,9 +1261,8 @@
             ).join('');
 
             const disabledNote = !canReact ? `<span class="reaction-disabled">Propre lettre</span>` : '';
-
-            const hasPhotos = l.photos && l.photos.length > 0;
-            const photosIndicator = hasPhotos ? `<span style="font-size:12px;color:var(--ink-soft);margin-left:4px;">📷${l.photos.length}</span>` : '';
+            const hasPhotos = l.photoCount && l.photoCount > 0;
+            const photosIndicator = hasPhotos ? `<span style="font-size:12px;color:var(--ink-soft);margin-left:4px;">📷${l.photoCount}</span>` : '';
 
             const card = document.createElement('div');
             const isNew = !isAuthor && !isRead && l.createdAt && (Date.now() - (l.createdAt.toDate ? l.createdAt.toDate() : new Date(l.createdAt)).getTime() < 3600000);
@@ -1323,8 +1293,6 @@
         });
     }
 
-    // ── COMPRESSION IMAGE ──
-    // Réduit agressivement : max 900px, qualité 0.65 → ~50-150 KB par photo
     function compressImage(dataUrl, maxWidth = 900, quality = 0.65) {
         return new Promise(resolve => {
             const img = new Image();
@@ -1340,12 +1308,8 @@
         });
     }
 
-    // ── PHOTOS : stockées dans une collection séparée "photos" ──
-    // Chaque doc photos/{letterId} contient { data: ["base64...", ...] }
-    // Ainsi la lettre principale reste légère (<1MB)
     async function savePhotos(letterId, photos) {
         if (!photos.length) {
-            // Supprimer les anciennes photos si on vide
             try { await deleteDoc(doc(photosCol, letterId)); } catch(_) {}
             return;
         }
@@ -1362,7 +1326,6 @@
         } catch(_) { return []; }
     }
 
-    // ── SAVE ──
     window.saveLetter = async function() {
         const title = document.getElementById('title').value.trim();
         const text  = document.getElementById('content').value.trim();
@@ -1415,7 +1378,7 @@
         }
     };
 
-    window._startEdit = function(id, event) {
+    window._startEdit = async function(id, event) {
         event.stopPropagation();
         const l = allLetters.find(x => x.id === id);
         if (!l || l.author !== currentUser) return;
@@ -1423,12 +1386,13 @@
         document.getElementById('title').value = l.title;
         document.getElementById('content').value = l.text;
         selectedMotif = l.motif || 'none';
-        // Update motif UI
+        
         document.querySelectorAll('.motif-option').forEach(o => {
             o.classList.toggle('selected', o.dataset.motif === selectedMotif);
         });
-        // Load photos — les URLs Storage sont gardées telles quelles
-        uploadedPhotos = (l.photos || []).map((url, i) => ({ dataUrl: url, name: `photo_${i}` }));
+        
+        const fetchedPhotos = await loadPhotos(id);
+        uploadedPhotos = fetchedPhotos.map((url, i) => ({ dataUrl: url, name: `photo_${i}` }));
         renderPhotoPreviews();
         document.getElementById('cancelEditBtn').style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1459,7 +1423,6 @@
         activeLetter = allLetters.find(x => x.id === id);
         if (!activeLetter) return;
 
-        // Mark as read
         const readBy = activeLetter.readBy || [];
         if (activeLetter.author !== currentUser && !readBy.includes(currentUser)) {
             readBy.push(currentUser);
@@ -1477,15 +1440,18 @@
         document.getElementById('sheetContent').textContent = activeLetter.text;
         document.getElementById('sheetFooter').textContent = `— ${activeLetter.author} ✦`;
 
-        // Photos
         const photosEl = document.getElementById('sheetPhotos');
         photosEl.innerHTML = '';
-        (activeLetter.photos || []).forEach(dataUrl => {
-            const div = document.createElement('div');
-            div.className = 'sheet-photo';
-            div.innerHTML = `<img src="${dataUrl}" alt="photo">`;
-            photosEl.appendChild(div);
-        });
+        
+        const fetchedPhotos = await loadPhotos(id);
+        if (fetchedPhotos && fetchedPhotos.length > 0) {
+            fetchedPhotos.forEach(dataUrl => {
+                const div = document.createElement('div');
+                div.className = 'sheet-photo';
+                div.innerHTML = `<img src="${dataUrl}" alt="photo">`;
+                photosEl.appendChild(div);
+            });
+        }
 
         document.getElementById('readerView').style.display = 'block';
         document.body.style.overflow = 'hidden';
@@ -1497,9 +1463,11 @@
     };
 
     function initFirebaseListener() {
-        // Affiche un état de chargement clair
-        document.getElementById('lettersList').innerHTML =
-            `<div class="empty-state" style="opacity:0.5;font-size:16px;">⏳ Chargement des lettres…</div>`;
+        if (usingLocal || !lettersCol) {
+            document.getElementById('lettersList').innerHTML = `<div class="empty-state">Mode local actif.</div>`;
+            return;
+        }
+        document.getElementById('lettersList').innerHTML = `<div class="empty-state" style="opacity:0.5;font-size:16px;">⏳ Chargement des lettres…</div>`;
 
         try {
             onSnapshot(
@@ -1516,19 +1484,16 @@
                     renderLetters(letters);
                 },
                 (err) => {
-                    // Erreur Firestore (règles, réseau…) — affichée clairement
                     console.error('Firestore listener error:', err);
                     document.getElementById('lettersList').innerHTML =
                         `<div class="empty-state" style="color:#C0392B;opacity:1;font-size:15px;">
                             ⚠️ Impossible de charger les lettres.<br>
-                            <span style="font-size:13px;opacity:0.7;">Vérifie ta connexion ou les règles Firestore.<br>Erreur : ${err.code || err.message}</span>
+                            <span style="font-size:13px;opacity:0.7;">Erreur : ${err.code || err.message}</span>
                         </div>`;
                 }
             );
         } catch(e) {
             console.error('initFirebaseListener crash:', e);
-            document.getElementById('lettersList').innerHTML =
-                `<div class="empty-state" style="color:#C0392B;opacity:1;">⚠️ Erreur de connexion Firebase.</div>`;
         }
     }
 
