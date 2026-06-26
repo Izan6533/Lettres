@@ -672,7 +672,6 @@
 </head>
 <body>
 
-<!-- Pétales décoratifs -->
 <div class="petal" style="left:5%;animation-duration:18s;animation-delay:0s;">🌸</div>
 <div class="petal" style="left:20%;animation-duration:22s;animation-delay:4s;">✨</div>
 <div class="petal" style="left:40%;animation-duration:16s;animation-delay:8s;">🌸</div>
@@ -704,7 +703,6 @@
 </header>
 
 <div class="layout">
-    <!-- ── FORMULAIRE ── -->
     <section class="write-section">
         <h2 class="panel-title" id="formTitle">✦ Partage tes sentiments</h2>
         <div id="statusMsg"></div>
@@ -719,7 +717,6 @@
             <div class="word-counter" id="wordCounter">0 mot</div>
         </div>
 
-        <!-- MOTIF SELECTOR -->
         <div class="field-group">
             <label>Motif décoratif</label>
             <div class="motif-grid" id="motifGrid">
@@ -746,7 +743,6 @@
             </div>
         </div>
 
-        <!-- PHOTOS -->
         <div class="field-group">
             <label>Photos (jusqu'à 5)</label>
             <div class="photo-upload-zone" onclick="document.getElementById('photoInput').click()">
@@ -763,9 +759,7 @@
         <button class="cancel-btn" id="cancelEditBtn" onclick="resetForm()" style="display:none;">Annuler la modification</button>
     </section>
 
-    <!-- ── LISTE ── -->
     <section class="history-section">
-        <!-- VERSET DU JOUR -->
         <div id="bibleVerseCard" class="bible-verse-card">
             <div class="bible-verse-tag" id="bibleVerseTag">❤️ Amour</div>
             <div class="bible-verse-text" id="bibleVerseText"></div>
@@ -773,7 +767,6 @@
             <span class="bible-verse-day" id="bibleVerseDay"></span>
         </div>
 
-        <!-- ESPACE PARTAGÉ VERSETS -->
         <div class="verse-space">
             <div class="verse-space-header">
                 <span>📖</span>
@@ -810,7 +803,6 @@
     </section>
 </div>
 
-<!-- ── READER ── -->
 <div id="readerView">
     <div class="reader-topbar">
         <button class="reader-btn" onclick="closeLetter()">⬅️ Retour</button>
@@ -954,32 +946,26 @@
         preview.style.display = 'none';
         pendingVerseData = null;
 
-        // Normalise la référence : "Jean 3:16" → "jean+3:16"
-        // On essaie plusieurs proxies/APIs pour contourner le CORS de github.io
         const normalized = q.trim();
 
         // Correspondance des noms de livres FR → EN pour l'API anglophone
         const frToEn = {
-            'genèse':'genesis','exode':'exodus','lévitique':'leviticus','nombres':'numbers',
-            'deutéronome':'deuteronomy','josué':'joshua','juges':'judges','ruth':'ruth',
-            '1 samuel':'1samuel','2 samuel':'2samuel','1 rois':'1kings','2 rois':'2kings',
-            '1 chroniques':'1chronicles','2 chroniques':'2chronicles','esdras':'ezra',
-            'néhémie':'nehemiah','esther':'esther','job':'job','psaumes':'psalms','psaume':'psalms',
-            'proverbes':'proverbs','ecclésiaste':'ecclesiastes','cantique':'songofsolomon',
-            'ésaïe':'isaiah','jérémie':'jeremiah','lamentations':'lamentations',
-            'ézéchiel':'ezekiel','daniel':'daniel','osée':'hosea','joël':'joel',
-            'amos':'amos','abdias':'obadiah','jonas':'jonah','michée':'micah',
-            'nahoum':'nahum','habacuc':'habakkuk','sophonie':'zephaniah','aggée':'haggai',
-            'zacharie':'zechariah','malachie':'malachi',
-            'matthieu':'matthew','matt':'matthew','marc':'mark','luc':'luke','jean':'john',
-            'actes':'acts','romains':'romans','1 corinthiens':'1corinthians',
-            '2 corinthiens':'2corinthians','galates':'galatians','éphésiens':'ephesians',
-            'philippiens':'philippians','colossiens':'colossians',
-            '1 thessaloniciens':'1thessalonians','2 thessaloniciens':'2thessalonians',
-            '1 timothée':'1timothy','2 timothée':'2timothy','tite':'titus',
-            'philémon':'philemon','hébreux':'hebrews','jacques':'james',
-            '1 pierre':'1peter','2 pierre':'2peter','1 jean':'1john','2 jean':'2john',
-            '3 jean':'3john','jude':'jude','apocalypse':'revelation'
+            'genese':'genesis','genèse':'genesis','exode':'exodus','levitique':'leviticus','lévitique':'leviticus',
+            'nombres':'numbers','deuteronome':'deuteronomy','deutéronome':'deuteronomy','josue':'joshua','josué':'joshua',
+            'juges':'judges','ruth':'ruth','1 samuel':'1samuel','2 samuel':'2samuel','1 rois':'1kings','2 rois':'2kings',
+            '1 chroniques':'1chronicles','2 chroniques':'2chronicles','esdras':'ezra','nehemie':'nehemiah','néhémie':'nehemiah',
+            'esther':'esther','job':'job','psaumes':'psalms','psaume':'psalms','proverbes':'proverbs','ecclesiaste':'ecclesiastes',
+            'ecclésiaste':'ecclesiastes','cantique':'songofsolomon','esaie':'isaiah','ésaïe':'isaiah','jeremie':'jeremiah',
+            'jérémie':'jeremiah','lamentations':'lamentations','ezechiel':'ezekiel','ézéchiel':'ezekiel','daniel':'daniel',
+            'osee':'hosea','osée':'hosea','joel':'joel','joël':'joel','amos':'amos','abdias':'obadiah','jonas':'jonah',
+            'michee':'micah','michée':'micah','nahoum':'nahum','habacuc':'habakkuk','sophonie':'zephaniah','aggee':'haggai',
+            'aggée':'haggai','zacharie':'zechariah','malachie':'malachi','matthieu':'matthew','marc':'mark','luc':'luke',
+            'jean':'john','actes':'acts','romains':'romans','1 corinthiens':'1corinthians','2 corinthiens':'2corinthians',
+            'galates':'galatians','ephesiens':'ephesians','éphésiens':'ephesians','philippiens':'philippians','colossiens':'colossians',
+            '1 thessaloniciens':'1thessalonians','2 thessaloniciens':'2thessalonians','1 timothee':'1timothy','1 timothée':'1timothy',
+            '2 timothee':'2timothy','2 timothée':'2timothy','tite':'titus','philemon':'philemon','philémon':'philemon',
+            'hebreux':'hebrews','hébreux':'hebrews','jacques':'james','1 pierre':'1peter','2 pierre':'2peter',
+            '1 jean':'1john','2 jean':'2john','3 jean':'3john','jude':'jude','apocalypse':'revelation'
         };
 
         function translateRef(ref) {
@@ -989,53 +975,32 @@
                     return en + ref.slice(fr.length);
                 }
             }
-            return ref; // déjà en anglais peut-être
-        }
-
-        async function tryFetch(url) {
-            const res = await fetch(url, { mode: 'cors' });
-            if (!res.ok) throw new Error(res.status);
-            return res.json();
+            return ref;
         }
 
         try {
             const enRef = translateRef(normalized);
-
-            // API 1 : api.esv.org (anglais seulement, on l'utilise pour les refs)
-            // API 2 : cdn.jsdelivr.net proxy vers bible-api (CORS libre)
-            // API 3 : corsproxy.io → bible-api.com
-
-            let text = null, refOut = null;
-
-            // Essai 1 : proxy CORS public vers bible-api.com
-            const proxyUrls = [
-                `https://corsproxy.io/?${encodeURIComponent('https://bible-api.com/' + encodeURIComponent(normalized) + '?translation=lsg')}`,
-                `https://api.allorigins.win/get?url=${encodeURIComponent('https://bible-api.com/' + encodeURIComponent(normalized) + '?translation=lsg')}`,
-            ];
-
-            for (const url of proxyUrls) {
-                try {
-                    const data = await tryFetch(url);
-                    // allorigins renvoie { contents: "..." }
-                    const parsed = data.contents ? JSON.parse(data.contents) : data;
-                    if (parsed && parsed.text) {
-                        text = parsed.text.trim();
-                        refOut = parsed.reference;
-                        break;
-                    }
-                } catch(_) { continue; }
+            
+            // L'API bible-api.com gère déjà le CORS, on l'appelle directement avec le nom du livre en anglais
+            const apiUrl = `https://bible-api.com/${encodeURIComponent(enRef)}?translation=lsg`;
+            const response = await fetch(apiUrl);
+            
+            if (!response.ok) throw new Error("Verset introuvable");
+            
+            const data = await response.json();
+            
+            if (data && data.text) {
+                pendingVerseData = { text: data.text.trim(), ref: data.reference || normalized };
+                document.getElementById('previewText').textContent = data.text.trim();
+                document.getElementById('previewRef').textContent = '— ' + (data.reference || normalized);
+                document.getElementById('verseComment').value = '';
+                preview.style.display = 'block';
+            } else {
+                throw new Error("Erreur de format");
             }
 
-            if (!text) throw new Error('all failed');
-
-            pendingVerseData = { text, ref: refOut || normalized };
-            document.getElementById('previewText').textContent = text;
-            document.getElementById('previewRef').textContent = '— ' + (refOut || normalized);
-            document.getElementById('verseComment').value = '';
-            preview.style.display = 'block';
-
         } catch(e) {
-            document.getElementById('previewText').textContent = '⚠️ Verset introuvable ou erreur réseau. Essaie : Jean 3:16 · Psaumes 23 · 1 Corinthiens 13:4 · Philippiens 4:13';
+            document.getElementById('previewText').textContent = '⚠️ Verset introuvable. Essaie : Jean 3:16 · Psaumes 23:1 · 1 Corinthiens 13:4';
             document.getElementById('previewRef').textContent = '';
             preview.style.display = 'block';
         } finally {
@@ -1281,7 +1246,7 @@
     }
 
     function escHtml(str) {
-        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&quot;');
     }
 
     function renderLetters(letters) {
