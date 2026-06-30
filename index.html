@@ -289,11 +289,9 @@
         .letter-card-accent { height: 5px; width: 100%; }
         .accent-izan { background: linear-gradient(to right, #C0392B, #E05C4B, #C0392B); }
         .accent-thalia { background: linear-gradient(to right, #D4699A, #F0A0C8, #D4699A); }
-        /* Bordures spécifiques versets : Thalia = vert, Izan = noir */
-        .letter-card.kind-verse.author-thalia { border: 2px solid #2E7D6E; }
-        .letter-card.kind-verse.author-izan { border: 2px solid #1A1A1A; }
-        .letter-card.kind-verse.author-thalia .letter-card-accent { background: linear-gradient(to right, #2E7D6E, #4FA593, #2E7D6E); }
-        .letter-card.kind-verse.author-izan .letter-card-accent { background: linear-gradient(to right, #1A1A1A, #3A3A3A, #1A1A1A); }
+        /* Bordures spécifiques versets : Thalia = vert (haut seulement), Izan = noir (haut seulement) */
+        .letter-card.kind-verse.author-thalia .letter-card-accent { background: linear-gradient(to right, #2E7D6E, #4FA593, #2E7D6E); height: 6px; }
+        .letter-card.kind-verse.author-izan .letter-card-accent { background: linear-gradient(to right, #1A1A1A, #3A3A3A, #1A1A1A); height: 6px; }
 
         .kind-tag {
             display: inline-flex; align-items: center; gap: 4px;
@@ -1028,16 +1026,32 @@
         const chapIdx = +document.getElementById('verseChapterSelect').value;
         const vStart = +document.getElementById('verseStartSelect').value;
         const isRange = document.getElementById('verseRangeToggle').checked;
-        let ref;
+        const preview = document.getElementById('verseRefPreview');
+        const sendBtn = document.getElementById('submitVerseBtn');
+
         if (isRange) {
-            let vEnd = +document.getElementById('verseEndSelect').value;
-            if (vEnd < vStart) vEnd = vStart;
-            ref = vEnd > vStart ? `${book.name} ${chapIdx+1}:${vStart}-${vEnd}` : `${book.name} ${chapIdx+1}:${vStart}`;
+            const vEnd = +document.getElementById('verseEndSelect').value;
+            if (vEnd <= vStart) {
+                // Invalid range — show error, block send
+                preview.textContent = `⚠ Le verset de fin (${vEnd}) doit être supérieur au verset de début (${vStart})`;
+                preview.style.color = '#C0392B';
+                preview.style.background = '#fde8e8';
+                preview.style.borderColor = '#f5c0c0';
+                sendBtn.disabled = true;
+                sendBtn.style.opacity = '0.45';
+                return null;
+            }
+            preview.textContent = `${book.name} ${chapIdx+1}:${vStart}-${vEnd}`;
         } else {
-            ref = `${book.name} ${chapIdx+1}:${vStart}`;
+            preview.textContent = `${book.name} ${chapIdx+1}:${vStart}`;
         }
-        document.getElementById('verseRefPreview').textContent = ref;
-        return ref;
+        // Valid — reset styles
+        preview.style.color = '#2E7D6E';
+        preview.style.background = 'var(--ivory)';
+        preview.style.borderColor = 'var(--ivory-dk)';
+        sendBtn.disabled = false;
+        sendBtn.style.opacity = '1';
+        return preview.textContent;
     };
     populateVerseAuthorSelect();
     window.onVerseAuthorChange();
@@ -1056,6 +1070,7 @@
 
     window.saveVerseLetter = async function() {
         const ref = updateVerseRefPreview();
+        if (!ref) return; // invalid range — blocked
         const verseText = document.getElementById('verseTextInput').value.trim();
         const feeling = document.getElementById('verseFeelingInput').value.trim();
         if (!verseText) {
@@ -1281,7 +1296,6 @@
                 : `<span class="kind-tag kind-letter">Lettre</span>`;
 
             const titleDisplay = isVerse ? (l.verseRef || l.title) : l.title;
-            const verseRefLine = isVerse ? `<p class="verse-ref-line">📖 ${escHtml(l.verseRef || '')}</p>` : '';
 
             const card = document.createElement('div');
             const isNew = !isAuthor && !isRead && l.createdAt && (Date.now() - (l.createdAt.toDate ? l.createdAt.toDate() : new Date(l.createdAt)).getTime() < 3600000);
@@ -1300,7 +1314,6 @@
                             <h3>${escHtml(titleDisplay)}${motifEmoji}${photosIndicator}</h3>
                         </div>
                         <p class="letter-meta">De ${escHtml(l.author)} · ${dateStr}${editedStr}</p>
-                        ${verseRefLine}
                     </div>
                     <div class="card-actions" style="display:${isAuthor?'flex':'none'};">
                         <button class="icon-btn" title="Modifier" onclick="window._startEdit('${l.id}',event)">✏️</button>
