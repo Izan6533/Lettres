@@ -133,21 +133,42 @@
         /* ── WRITE PANEL ── */
         .write-section {
             background: var(--paper); border: 1px solid var(--ivory-dk);
-            border-radius: 16px; padding: 32px 28px 28px;
+            border-radius: 16px; padding: 0 0 28px;
             box-shadow: 0 8px 32px var(--shadow), 0 0 0 1px rgba(201,169,110,0.1) inset;
             position: relative; overflow: hidden;
         }
         .write-section::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
             background: linear-gradient(to right, var(--bordeaux), var(--gold), var(--thalia));
+            z-index: 3;
         }
-        .write-section::after {
-            content: '✦'; position: absolute; top: 12px; right: 20px;
-            color: var(--gold); font-size: 16px; opacity: 0.4;
+
+        /* ── BROWSER-STYLE TABS ── */
+        .panel-tabs {
+            display: flex; padding: 16px 16px 0; gap: 6px; margin-top: 5px;
+            position: relative; z-index: 2;
         }
+        .panel-tab {
+            flex: 1; padding: 11px 10px 10px; border: 1px solid var(--ivory-dk);
+            border-bottom: none; border-radius: 10px 10px 0 0;
+            background: var(--ivory); cursor: pointer; text-align: center;
+            font-family: 'Cormorant Garamond', serif; font-size: 16px; font-style: italic;
+            color: var(--ink-soft); transition: background 0.2s, color 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .panel-tab.active {
+            background: var(--paper); color: var(--bordeaux); font-weight: 600;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+        }
+        .panel-tab .tab-icon { font-size: 15px; }
+        .panel-body {
+            padding: 22px 28px 0; border-top: 1px solid var(--ivory-dk);
+        }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
         .panel-title {
-            font-family: 'Cormorant Garamond', serif; font-size: 22px;
-            color: var(--bordeaux); margin-bottom: 22px; font-style: italic;
+            font-family: 'Cormorant Garamond', serif; font-size: 20px;
+            color: var(--bordeaux); margin-bottom: 18px; font-style: italic;
         }
         .field-group { margin-bottom: 16px; }
         .field-group label {
@@ -219,6 +240,9 @@
         }
         .seal-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,34,82,0.35); }
         .seal-btn::after { content: ' 💌'; }
+        .seal-btn.verse-seal { background: linear-gradient(135deg, #2E7D6E, #1a5c50); }
+        .seal-btn.verse-seal::after { content: ' 📖'; }
+        .seal-btn.verse-seal:hover { box-shadow: 0 6px 20px rgba(46,125,110,0.35); }
         .cancel-btn {
             width: 100%; padding: 9px; margin-top: 8px;
             background: transparent; border: 1px solid var(--ivory-dk);
@@ -265,6 +289,21 @@
         .letter-card-accent { height: 5px; width: 100%; }
         .accent-izan { background: linear-gradient(to right, #C0392B, #E05C4B, #C0392B); }
         .accent-thalia { background: linear-gradient(to right, #D4699A, #F0A0C8, #D4699A); }
+        /* Bordures spécifiques versets : Thalia = vert, Izan = noir */
+        .letter-card.kind-verse.author-thalia { border: 2px solid #2E7D6E; }
+        .letter-card.kind-verse.author-izan { border: 2px solid #1A1A1A; }
+        .letter-card.kind-verse.author-thalia .letter-card-accent { background: linear-gradient(to right, #2E7D6E, #4FA593, #2E7D6E); }
+        .letter-card.kind-verse.author-izan .letter-card-accent { background: linear-gradient(to right, #1A1A1A, #3A3A3A, #1A1A1A); }
+
+        .kind-tag {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+            padding: 2px 8px; border-radius: 20px; font-family: 'EB Garamond', serif;
+            font-weight: 600; flex-shrink: 0;
+        }
+        .kind-tag.kind-letter { background: var(--rose); color: var(--bordeaux); border: 1px solid var(--rose-dk); }
+        .kind-tag.kind-verse-izan { background: #ECECEC; color: #1A1A1A; border: 1px solid #1A1A1A; }
+        .kind-tag.kind-verse-thalia { background: #E3F3EF; color: #1a5c50; border: 1px solid #2E7D6E; }
 
         .letter-card-body { display: flex; align-items: center; padding: 14px 14px 10px 16px; gap: 13px; }
         .letter-avatar {
@@ -277,11 +316,13 @@
         .avatar-thalia { background: linear-gradient(135deg, var(--thalia), #B5507E); }
 
         .letter-info { flex-grow: 1; cursor: pointer; min-width: 0; }
+        .letter-info-top { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; flex-wrap: wrap; }
         .letter-info h3 {
             font-family: 'Cormorant Garamond', serif; font-size: 19px; font-style: italic;
             margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .letter-meta { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+        .verse-ref-line { font-size: 13px; color: #2E7D6E; font-weight: 600; margin-top: 2px; }
 
         .card-actions { display: flex; gap: 6px; flex-shrink: 0; }
         .icon-btn {
@@ -413,6 +454,13 @@
             font-family: 'Caveat', cursive; font-size: clamp(19px,4vw,26px);
             line-height: 1.8; white-space: pre-wrap; position: relative; z-index: 2;
         }
+        .sheet-verse-block {
+            background: rgba(46,125,110,0.06); border-left: 3px solid #2E7D6E;
+            padding: 14px 18px; border-radius: 6px; margin-bottom: 20px;
+            position: relative; z-index: 2;
+        }
+        .sheet-verse-ref { font-family: 'EB Garamond', serif; font-size: 13px; font-weight: 600; color: #2E7D6E; margin-bottom: 6px; }
+        .sheet-verse-text { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 19px; line-height: 1.6; color: var(--ink); }
         .sheet-footer {
             margin-top: 40px; text-align: right; font-family: 'Caveat', cursive;
             font-size: 22px; font-style: italic; position: relative; z-index: 2;
@@ -493,118 +541,23 @@
             position: relative; z-index: 1;
         }
 
-        /* ── ESPACE PARTAGÉ VERSETS ── */
-        .verse-space {
-            background: var(--paper); border: 1px solid var(--ivory-dk);
-            border-radius: 14px; margin-bottom: 22px; overflow: hidden;
-            box-shadow: 0 4px 20px var(--shadow);
+        /* ── VERSET : sélecteurs livre/chapitre/verset ── */
+        .verse-select-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 8px; }
+        .verse-select-row select { font-size: 15px; padding: 10px 8px; }
+        .verse-range-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+        .verse-range-row label.inline-label {
+            font-size: 11px; color: var(--ink-soft); white-space: nowrap; text-transform: none; letter-spacing: 0; margin: 0;
         }
-        .verse-space-header {
-            background: linear-gradient(135deg, #2E7D6E 0%, #1a5c50 100%);
-            padding: 14px 18px; display: flex; align-items: center; gap: 10px;
-        }
-        .verse-space-header h3 {
-            font-family: 'Cormorant Garamond', serif; font-size: 19px; font-style: italic;
-            color: white; font-weight: 300;
-        }
-        .verse-space-header span { font-size: 20px; }
-        .verse-search-area { padding: 14px 16px; border-bottom: 1px solid var(--ivory-dk); background: var(--ivory); }
-        .verse-search-area { padding: 14px 16px; border-bottom: 1px solid var(--ivory-dk); background: var(--ivory); }
-        .verse-search-row { display: flex; gap: 8px; }
-        .verse-search-row input {
-            flex-grow: 1; padding: 9px 13px; border: 1px solid var(--ivory-dk);
-            background: white; border-radius: 8px; font-family: 'EB Garamond', serif;
-            font-size: 16px; color: var(--ink); outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .verse-search-row input:focus { border-color: #2E7D6E; box-shadow: 0 0 0 3px rgba(46,125,110,0.12); }
-        .verse-search-btn {
-            padding: 9px 16px; background: #2E7D6E; color: white; border: none;
-            border-radius: 8px; cursor: pointer; font-family: 'Cormorant Garamond', serif;
-            font-size: 16px; font-style: italic; white-space: nowrap; transition: background 0.2s;
-        }
-        .verse-search-btn:hover { background: #1a5c50; }
-        .verse-search-btn:disabled { opacity: 0.6; }
-        .verse-search-hint { font-size: 11px; color: var(--ink-soft); margin-top: 6px; font-style: italic; }
-        .verse-preview {
-            margin-top: 12px; padding: 12px 14px; background: white;
-            border-radius: 8px; border: 1px solid var(--ivory-dk); display: none;
-        }
-        .verse-preview-text { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 16px; line-height: 1.6; color: var(--ink); }
-        .verse-preview-ref { font-size: 12px; color: #2E7D6E; margin-top: 6px; display: block; font-weight: 500; }
-        .verse-preview-actions { display: flex; gap: 8px; margin-top: 10px; }
-        .verse-share-btn {
-            flex: 1; padding: 9px; background: var(--bordeaux); color: white; border: none;
-            border-radius: 8px; font-family: 'Cormorant Garamond', serif; font-size: 16px;
-            font-style: italic; cursor: pointer; transition: background 0.2s;
-        }
-        .verse-share-btn:hover { background: #6B1840; }
-        .verse-comment-input {
-            flex: 2; padding: 9px 12px; border: 1px solid var(--ivory-dk);
-            border-radius: 8px; font-family: 'EB Garamond', serif; font-size: 15px;
-            color: var(--ink); outline: none; background: var(--ivory);
+        .verse-range-checkbox { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+        .verse-range-checkbox input[type=checkbox] { width: auto; accent-color: #2E7D6E; }
+        .verse-range-checkbox label { font-size: 13px; color: var(--ink-soft); text-transform: none; letter-spacing: 0; margin: 0; }
+        .verse-ref-preview {
+            margin-top: 10px; padding: 8px 12px; background: var(--ivory);
+            border-radius: 8px; border: 1px dashed var(--ivory-dk);
+            font-size: 13px; color: #2E7D6E; font-weight: 600; text-align: center;
         }
 
-        /* ── VERSETS PARTAGÉS ── */
-        .shared-verses-list { padding: 4px 0; max-height: 480px; overflow-y: auto; }
-        .shared-verse-item {
-            padding: 14px 16px; border-bottom: 1px dashed var(--ivory-dk);
-            transition: background 0.15s;
-        }
-        .shared-verse-item:last-child { border-bottom: none; }
-        .shared-verse-item:hover { background: rgba(201,169,110,0.04); }
-        .svi-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-        .svi-avatar {
-            width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center;
-            justify-content: center; font-family: 'Cormorant Garamond', serif;
-            font-size: 13px; font-style: italic; color: white; flex-shrink: 0;
-        }
-        .svi-author { font-size: 13px; color: var(--ink-soft); }
-        .svi-date { font-size: 11px; color: var(--gold); margin-left: auto; font-style: italic; }
-        .svi-ref {
-            font-size: 12px; font-weight: 600; color: #2E7D6E; margin-bottom: 5px;
-            letter-spacing: 0.05em;
-        }
-        .svi-text {
-            font-family: 'Cormorant Garamond', serif; font-style: italic;
-            font-size: 15px; line-height: 1.6; color: var(--ink);
-            border-left: 3px solid var(--gold-lt); padding-left: 10px; margin-bottom: 8px;
-        }
-        .svi-comment {
-            font-size: 14px; color: var(--ink-soft); background: var(--ivory);
-            padding: 7px 10px; border-radius: 6px; font-style: italic;
-            border: 1px solid var(--ivory-dk);
-        }
-        .svi-comment::before { content: '💬 '; }
-        .svi-actions { display: flex; gap: 6px; margin-top: 8px; }
-        .svi-reply-btn {
-            background: none; border: 1px solid var(--ivory-dk); border-radius: 20px;
-            padding: 3px 10px; font-size: 12px; cursor: pointer; color: var(--ink-soft);
-            font-family: 'EB Garamond', serif; transition: 0.2s;
-        }
-        .svi-reply-btn:hover { background: var(--rose); border-color: var(--rose-dk); }
-        .svi-del-btn {
-            background: none; border: none; font-size: 12px; cursor: pointer;
-            color: var(--ink-soft); opacity: 0.4; padding: 3px 6px;
-        }
-        .svi-del-btn:hover { opacity: 1; color: var(--izan); }
-        .svi-reply-form { margin-top: 8px; display: none; }
-        .svi-reply-row { display: flex; gap: 6px; }
-        .svi-reply-input {
-            flex: 1; padding: 7px 10px; border: 1px solid var(--ivory-dk);
-            border-radius: 6px; font-family: 'EB Garamond', serif; font-size: 14px;
-            background: var(--ivory); outline: none;
-        }
-        .svi-reply-send {
-            padding: 7px 12px; background: #2E7D6E; color: white; border: none;
-            border-radius: 6px; cursor: pointer; font-size: 14px;
-        }
-        .svi-replies { margin-top: 6px; display: flex; flex-direction: column; gap: 4px; }
-        .svi-reply-msg {
-            font-size: 13px; padding: 5px 10px; background: var(--rose);
-            border-radius: 6px; border: 1px solid var(--rose-dk);
-        }
-        .svi-reply-msg strong { color: var(--bordeaux); font-size: 11px; }
+        /* ── ESPACE PARTAGÉ VERSETS (liste, conservé pour affichage récap optionnel) ── */
         .verses-empty { text-align: center; padding: 30px 16px; color: var(--ink-soft); opacity: 0.5; font-style: italic; font-size: 15px; }
 
         /* ── LETTER SEAL ANIMATION ── */
@@ -651,7 +604,7 @@
                 print-color-adjust: exact !important;
             }
             .sheet-meta, .sheet-title, .sheet-content,
-            .sheet-photos, .sheet-footer {
+            .sheet-photos, .sheet-footer, .sheet-verse-block {
                 position: static !important;
                 overflow: visible !important;
                 page-break-inside: avoid;
@@ -702,59 +655,120 @@
 
 <div class="layout">
     <section class="write-section">
-        <h2 class="panel-title" id="formTitle">✦ Partage tes sentiments</h2>
-        <div id="statusMsg"></div>
-
-        <div class="field-group">
-            <label>Titre de ton trésor</label>
-            <input type="text" id="title" placeholder="Un doux titre…">
-        </div>
-        <div class="field-group">
-            <label>Ta lettre</label>
-            <textarea id="content" placeholder="Laisse ton cœur parler…" oninput="updateWordCount()"></textarea>
-            <div class="word-counter" id="wordCounter">0 mot</div>
-        </div>
-
-        <div class="field-group">
-            <label>Motif décoratif</label>
-            <div class="motif-grid" id="motifGrid">
-                <div class="motif-option selected" data-motif="none" onclick="selectMotif('none', this)">
-                    <span style="font-size:22px;">—</span>
-                    <span>Aucun</span>
-                </div>
-                <div class="motif-option" data-motif="hearts" onclick="selectMotif('hearts', this)">
-                    <div class="motif-preview-bg" style="background-image:url('data:image/svg+xml,%3Csvg width=%2230%22 height=%2230%22 viewBox=%220 0 30 30%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ctext x=%225%22 y=%2222%22 font-size=%2216%22 opacity=%220.4%22%3E%E2%9D%A4%3C/text%3E%3C/svg%3E');background-size:30px;"></div>
-                    ❤️<span>Cœurs</span>
-                </div>
-                <div class="motif-option" data-motif="flowers" onclick="selectMotif('flowers', this)">
-                    <div class="motif-preview-bg" style="background-image:url('data:image/svg+xml,%3Csvg width=%2230%22 height=%2230%22 viewBox=%220 0 30 30%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ctext x=%223%22 y=%2222%22 font-size=%2216%22 opacity=%220.4%22%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E');background-size:30px;"></div>
-                    🌸<span>Fleurs</span>
-                </div>
-                <div class="motif-option" data-motif="stars" onclick="selectMotif('stars', this)">
-                    <div class="motif-preview-bg" style="background-image:url('data:image/svg+xml,%3Csvg width=%2230%22 height=%2230%22 viewBox=%220 0 30 30%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ctext x=%224%22 y=%2222%22 font-size=%2216%22 opacity=%220.4%22%3E%E2%9C%A8%3C/text%3E%3C/svg%3E');background-size:30px;"></div>
-                    ✨<span>Étoiles</span>
-                </div>
-                <div class="motif-option" data-motif="vintage" onclick="selectMotif('vintage', this)">
-                    <div class="motif-preview-bg" style="background-image:url('data:image/svg+xml,%3Csvg width=%2230%22 height=%2230%22 viewBox=%220 0 30 30%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ctext x=%224%22 y=%2222%22 font-size=%2214%22 opacity=%220.3%22%3E%F0%9F%93%9C%3C/text%3E%3C/svg%3E');background-size:30px;"></div>
-                    📜<span>Ancien</span>
-                </div>
+        <div class="panel-tabs">
+            <div class="panel-tab active" id="tabBtnLetter" onclick="switchPanelTab('letter')">
+                <span class="tab-icon">💌</span> Lettre
+            </div>
+            <div class="panel-tab" id="tabBtnVerse" onclick="switchPanelTab('verse')">
+                <span class="tab-icon">📖</span> Verset
             </div>
         </div>
 
-        <div class="field-group">
-            <label>Photos (jusqu'à 5)</label>
-            <div class="photo-upload-zone" onclick="document.getElementById('photoInput').click()">
-                <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotos(event)">
-                <div class="photo-upload-icon">📷</div>
-                <div class="photo-upload-text">Cliquer pour ajouter des photos</div>
-                <div class="photo-upload-sub">Galerie, appareil photo ou fichiers</div>
-            </div>
-            <div class="photos-preview" id="photosPreview"></div>
-            <div class="photos-count" id="photosCount"></div>
-        </div>
+        <div class="panel-body">
+            <div id="statusMsg"></div>
 
-        <button class="seal-btn" id="submitBtn" onclick="saveLetter()">Sceller &amp; envoyer la lettre</button>
-        <button class="cancel-btn" id="cancelEditBtn" onclick="resetForm()" style="display:none;">Annuler la modification</button>
+            <!-- ═══════ ONGLET LETTRE ═══════ -->
+            <div class="tab-pane active" id="paneLetter">
+                <h2 class="panel-title">✦ Partage tes sentiments</h2>
+
+                <div class="field-group">
+                    <label>Titre de ton trésor</label>
+                    <input type="text" id="title" placeholder="Un doux titre…">
+                </div>
+                <div class="field-group">
+                    <label>Ta lettre</label>
+                    <textarea id="content" placeholder="Laisse ton cœur parler…" oninput="updateWordCount()"></textarea>
+                    <div class="word-counter" id="wordCounter">0 mot</div>
+                </div>
+
+                <div class="field-group">
+                    <label>Motif décoratif</label>
+                    <div class="motif-grid" id="motifGrid">
+                        <div class="motif-option selected" data-motif="none" onclick="selectMotif('none', this)">
+                            <span style="font-size:22px;">—</span>
+                            <span>Aucun</span>
+                        </div>
+                        <div class="motif-option" data-motif="hearts" onclick="selectMotif('hearts', this)">
+                            <div class="motif-preview-bg" style="background-image:url('data:image/svg+xml,%3Csvg width=%2230%22 height=%2230%22 viewBox=%220 0 30 30%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ctext x=%225%22 y=%2222%22 font-size=%2216%22 opacity=%220.4%22%3E%E2%9D%A4%3C/text%3E%3C/svg%3E');background-size:30px;"></div>
+                            ❤️<span>Cœurs</span>
+                        </div>
+                        <div class="motif-option" data-motif="flowers" onclick="selectMotif('flowers', this)">
+                            <div class="motif-preview-bg" style="background-image:url('data:image/svg+xml,%3Csvg width=%2230%22 height=%2230%22 viewBox=%220 0 30 30%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ctext x=%223%22 y=%2222%22 font-size=%2216%22 opacity=%220.4%22%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E');background-size:30px;"></div>
+                            🌸<span>Fleurs</span>
+                        </div>
+                        <div class="motif-option" data-motif="stars" onclick="selectMotif('stars', this)">
+                            <div class="motif-preview-bg" style="background-image:url('data:image/svg+xml,%3Csvg width=%2230%22 height=%2230%22 viewBox=%220 0 30 30%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ctext x=%224%22 y=%2222%22 font-size=%2216%22 opacity=%220.4%22%3E%E2%9C%A8%3C/text%3E%3C/svg%3E');background-size:30px;"></div>
+                            ✨<span>Étoiles</span>
+                        </div>
+                        <div class="motif-option" data-motif="vintage" onclick="selectMotif('vintage', this)">
+                            <div class="motif-preview-bg" style="background-image:url('data:image/svg+xml,%3Csvg width=%2230%22 height=%2230%22 viewBox=%220 0 30 30%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ctext x=%224%22 y=%2222%22 font-size=%2214%22 opacity=%220.3%22%3E%F0%9F%93%9C%3C/text%3E%3C/svg%3E');background-size:30px;"></div>
+                            📜<span>Ancien</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label>Photos (jusqu'à 5)</label>
+                    <div class="photo-upload-zone" onclick="document.getElementById('photoInput').click()">
+                        <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotos(event)">
+                        <div class="photo-upload-icon">📷</div>
+                        <div class="photo-upload-text">Cliquer pour ajouter des photos</div>
+                        <div class="photo-upload-sub">Galerie, appareil photo ou fichiers</div>
+                    </div>
+                    <div class="photos-preview" id="photosPreview"></div>
+                    <div class="photos-count" id="photosCount"></div>
+                </div>
+
+                <button class="seal-btn" id="submitBtn" onclick="saveLetter()">Sceller &amp; envoyer la lettre</button>
+                <button class="cancel-btn" id="cancelEditBtn" onclick="resetForm()" style="display:none;">Annuler la modification</button>
+            </div>
+
+            <!-- ═══════ ONGLET VERSET ═══════ -->
+            <div class="tab-pane" id="paneVerse">
+                <h2 class="panel-title">📖 Partage un verset</h2>
+
+                <div class="field-group">
+                    <label>Auteur</label>
+                    <select id="verseAuthorSelect" onchange="onVerseAuthorChange()"></select>
+                </div>
+
+                <div class="verse-select-row">
+                    <div></div>
+                    <div class="field-group" style="margin-bottom:0;">
+                        <label>Chapitre</label>
+                        <select id="verseChapterSelect" onchange="onVerseChapterChange()"></select>
+                    </div>
+                    <div class="field-group" style="margin-bottom:0;">
+                        <label>Verset</label>
+                        <select id="verseStartSelect" onchange="updateVerseRefPreview()"></select>
+                    </div>
+                </div>
+
+                <div class="verse-range-checkbox">
+                    <input type="checkbox" id="verseRangeToggle" onchange="toggleVerseRange()">
+                    <label for="verseRangeToggle">Plusieurs versets qui se suivent</label>
+                </div>
+                <div class="verse-range-row" id="verseRangeRow" style="display:none;">
+                    <label class="inline-label">jusqu'au verset</label>
+                    <select id="verseEndSelect" onchange="updateVerseRefPreview()" style="flex:1;"></select>
+                </div>
+
+                <div class="verse-ref-preview" id="verseRefPreview">Genèse 1:1</div>
+
+                <div class="field-group" style="margin-top:16px;">
+                    <label>Texte du verset (écris-le toi-même)</label>
+                    <textarea id="verseTextInput" placeholder="Recopie ici le texte du verset…" style="height:100px;"></textarea>
+                </div>
+
+                <div class="field-group">
+                    <label>Ton ressenti sur ce verset</label>
+                    <textarea id="verseFeelingInput" placeholder="Ce que ce verset t'inspire, te fait ressentir…" style="height:100px;"></textarea>
+                </div>
+
+                <button class="seal-btn verse-seal" id="submitVerseBtn" onclick="saveVerseLetter()">Sceller &amp; envoyer le verset</button>
+                <button class="cancel-btn" id="cancelVerseEditBtn" onclick="resetVerseForm()" style="display:none;">Annuler la modification</button>
+            </div>
+        </div>
     </section>
 
     <section class="history-section">
@@ -763,31 +777,6 @@
             <div class="bible-verse-text" id="bibleVerseText"></div>
             <span class="bible-verse-ref" id="bibleVerseRef"></span>
             <span class="bible-verse-day" id="bibleVerseDay"></span>
-        </div>
-
-        <div class="verse-space">
-            <div class="verse-space-header">
-                <span>📖</span>
-                <h3>Nos versets partagés</h3>
-            </div>
-            <div class="verse-search-area">
-                <div class="verse-search-row">
-                    <input type="text" id="bibleSearchQuery" placeholder="Jean 3:16 · Psaumes 23:1 · 1 Corinthiens 13:4…" onkeypress="if(event.key==='Enter')searchAndPreview()">
-                    <button class="verse-search-btn" id="bibleSearchBtn" onclick="searchAndPreview()">Chercher</button>
-                </div>
-                <div class="verse-search-hint">Cherche n'importe quel verset de la Bible et partage-le avec un commentaire</div>
-                <div class="verse-preview" id="versePreview">
-                    <div class="verse-preview-text" id="previewText"></div>
-                    <span class="verse-preview-ref" id="previewRef"></span>
-                    <div class="verse-preview-actions">
-                        <input type="text" class="verse-comment-input" id="verseComment" placeholder="Ton commentaire (optionnel)…">
-                        <button class="verse-share-btn" onclick="shareVerse()">Partager ✦</button>
-                    </div>
-                </div>
-            </div>
-            <div class="shared-verses-list" id="sharedVersesList">
-                <div class="verses-empty">⏳ Chargement…</div>
-            </div>
         </div>
 
         <div id="typingIndicator" class="typing-indicator" style="display:none;">
@@ -810,6 +799,10 @@
         <div class="pattern-layer"></div>
         <div class="sheet-meta" id="sheetMeta"></div>
         <div class="sheet-title" id="sheetTitle"></div>
+        <div class="sheet-verse-block" id="sheetVerseBlock" style="display:none;">
+            <div class="sheet-verse-ref" id="sheetVerseRef"></div>
+            <div class="sheet-verse-text" id="sheetVerseText"></div>
+        </div>
         <div class="sheet-content" id="sheetContent"></div>
         <div class="sheet-photos" id="sheetPhotos"></div>
         <div class="sheet-footer" id="sheetFooter"></div>
@@ -847,6 +840,78 @@
         console.error('Firebase init échoué :', e);
         usingLocal = true;
     }
+
+    /* ═══════════════ STRUCTURE BIBLIQUE (livres + nb chapitres + nb versets par chapitre) ═══════════════
+       Aucun texte de verset n'est préchargé : seuls les repères (auteur/chapitre/verset) sont fournis.
+       Le texte est saisi à la main par Izan ou Thalia. */
+    const BIBLE_STRUCTURE = [
+        { name:"Genèse", chapters:[31,25,24,26,32,22,24,22,29,32,32,20,18,24,21,16,27,33,38,18,34,24,20,67,34,35,46,22,35,43,55,32,20,31,29,43,36,30,23,23,57,38,34,34,28,34,31,22,33,26] },
+        { name:"Exode", chapters:[22,25,22,31,23,30,25,32,35,29,10,51,22,31,27,36,16,27,25,26,36,31,33,18,40,37,21,43,46,38,18,35,23,35,35,38,29,31,43,38] },
+        { name:"Lévitique", chapters:[17,16,17,35,19,30,38,36,24,20,47,8,59,57,33,34,16,30,37,27,24,33,44,23,55,46,34] },
+        { name:"Nombres", chapters:[54,34,51,49,31,27,89,26,23,36,35,16,33,45,41,50,13,32,22,29,35,41,30,25,18,65,23,31,40,16,54,42,56,29,34,13] },
+        { name:"Deutéronome", chapters:[46,37,29,49,33,25,26,20,29,22,32,32,18,29,23,22,20,22,21,20,23,30,25,22,19,19,26,68,29,20,30,52,29,12] },
+        { name:"Josué", chapters:[18,24,17,24,15,27,26,35,27,43,23,24,33,15,63,10,18,28,51,9,45,34,16,33] },
+        { name:"Juges", chapters:[36,23,31,24,31,40,25,35,57,18,40,15,25,20,20,31,13,31,30,48,25] },
+        { name:"Ruth", chapters:[22,23,18,22] },
+        { name:"1 Samuel", chapters:[28,36,21,22,12,21,17,22,27,27,15,25,23,52,35,23,58,30,24,42,15,23,29,22,44,25,12,25,11,31,13] },
+        { name:"2 Samuel", chapters:[27,32,39,12,25,23,29,18,13,19,27,31,39,33,37,23,29,33,43,26,22,51,39,25] },
+        { name:"1 Rois", chapters:[53,46,28,34,18,38,51,66,28,29,43,33,34,31,34,34,24,46,21,43,29,53] },
+        { name:"2 Rois", chapters:[18,25,27,44,27,33,20,29,37,36,21,21,25,29,38,20,41,37,37,21,26,20,37,20,30] },
+        { name:"1 Chroniques", chapters:[54,55,24,43,26,81,40,40,44,14,47,40,14,17,29,43,27,17,19,8,30,19,32,31,31,32,34,21,30] },
+        { name:"2 Chroniques", chapters:[17,18,17,22,14,42,22,18,31,19,23,16,22,15,19,14,19,34,11,37,20,12,19,32,21,33,25,33,27,23,30] },
+        { name:"Esdras", chapters:[11,70,13,24,17,22,28,36,15,44] },
+        { name:"Néhémie", chapters:[11,20,38,17,19,19,73,18,38,39,36,47,31] },
+        { name:"Esther", chapters:[22,23,15,17,14,14,10,17,32,3] },
+        { name:"Job", chapters:[22,13,26,21,27,30,21,22,35,22,20,25,28,22,35,22,16,21,29,29,34,30,17,25,6,14,23,28,25,31,40,22,33,37,16,33,24,41,30,24,34,17] },
+        { name:"Psaumes", chapters:[6,12,8,8,12,10,17,9,20,18,7,8,6,7,5,11,15,50,14,9,13,31,6,10,22,12,14,9,11,12,24,11,22,22,28,12,40,22,13,17,13,11,5,26,17,11,9,14,20,23,19,9,6,7,23,13,11,11,17,12,8,12,11,10,13,20,7,35,36,5,24,20,28,23,10,12,20,72,13,19,16,8,18,12,13,17,7,18,52,17,16,15,5,23,11,13,12,9,9,5,8,28,22,35,45,48,43,13,31,7,10,10,9,8,18,19,2,29,176,7,8,9,4,8,5,6,5,6,8,8,3,18,3,3,21,26,9,8,24,13,10,7,12,15,21,10,20,14,9,6] },
+        { name:"Proverbes", chapters:[33,22,35,27,23,35,27,36,18,32,31,28,25,35,33,33,28,24,29,30,31,29,35,34,28,28,27,28,27,33,31] },
+        { name:"Ecclésiaste", chapters:[18,26,22,16,20,12,29,17,18,20,10,14] },
+        { name:"Cantique", chapters:[17,17,11,16,16,13,13,14] },
+        { name:"Ésaïe", chapters:[31,22,26,6,30,13,25,22,21,34,16,6,22,32,9,14,14,7,25,6,17,25,18,23,12,21,13,29,24,33,9,20,24,17,10,22,38,22,8,31,29,25,28,28,25,13,15,22,26,11,23,15,12,17,13,12,21,14,21,22,11,12,19,12,25,24] },
+        { name:"Jérémie", chapters:[19,37,25,31,31,30,34,22,26,25,23,17,27,22,21,21,27,23,15,18,14,30,40,10,38,24,22,17,32,24,40,44,26,22,19,32,21,28,18,16,18,22,13,30,5,28,7,47,39,46,64,34] },
+        { name:"Lamentations", chapters:[22,22,66,22,22] },
+        { name:"Ézéchiel", chapters:[28,10,27,17,17,14,27,18,11,22,25,28,23,23,8,63,24,32,14,49,32,31,49,27,17,21,36,26,21,26,18,32,33,31,15,38,28,23,29,49,26,20,27,31,25,24,23,35] },
+        { name:"Daniel", chapters:[21,49,30,37,31,28,28,27,27,21,45,13] },
+        { name:"Osée", chapters:[11,23,5,19,15,11,16,14,17,15,12,14,16,9] },
+        { name:"Joël", chapters:[20,32,21] },
+        { name:"Amos", chapters:[15,16,15,13,27,14,17,14,15] },
+        { name:"Abdias", chapters:[21] },
+        { name:"Jonas", chapters:[17,10,10,11] },
+        { name:"Michée", chapters:[16,13,12,13,15,16,20] },
+        { name:"Nahum", chapters:[15,13,19] },
+        { name:"Habacuc", chapters:[17,20,19] },
+        { name:"Sophonie", chapters:[18,15,20] },
+        { name:"Aggée", chapters:[15,23] },
+        { name:"Zacharie", chapters:[21,13,10,14,11,15,14,23,17,12,17,14,9,21] },
+        { name:"Malachie", chapters:[14,17,18,6] },
+        { name:"Matthieu", chapters:[25,23,17,25,48,34,29,34,38,42,30,50,58,36,39,28,27,35,30,34,46,46,39,51,46,75,66,20] },
+        { name:"Marc", chapters:[45,28,35,41,43,56,37,38,50,52,33,44,37,72,47,20] },
+        { name:"Luc", chapters:[80,52,38,44,39,49,50,56,62,42,54,59,35,35,32,31,37,43,48,47,38,71,56,53] },
+        { name:"Jean", chapters:[51,25,36,54,47,71,53,59,41,42,57,50,38,31,27,33,26,40,42,31,25] },
+        { name:"Actes", chapters:[26,47,26,37,42,15,60,40,43,48,30,25,52,28,41,40,34,28,41,38,40,30,35,27,27,32,44,31] },
+        { name:"Romains", chapters:[32,29,31,25,21,23,25,39,33,21,36,21,14,23,33,27] },
+        { name:"1 Corinthiens", chapters:[31,16,23,21,13,20,40,13,27,33,34,31,13,40,58,24] },
+        { name:"2 Corinthiens", chapters:[24,17,18,18,21,18,16,24,15,18,33,21,14] },
+        { name:"Galates", chapters:[24,21,29,31,26,18] },
+        { name:"Éphésiens", chapters:[23,22,21,32,33,24] },
+        { name:"Philippiens", chapters:[30,30,21,23] },
+        { name:"Colossiens", chapters:[29,23,25,18] },
+        { name:"1 Thessaloniciens", chapters:[10,20,13,18,28] },
+        { name:"2 Thessaloniciens", chapters:[12,17,18] },
+        { name:"1 Timothée", chapters:[20,15,16,16,25,21] },
+        { name:"2 Timothée", chapters:[18,26,17,22] },
+        { name:"Tite", chapters:[16,15,15] },
+        { name:"Philémon", chapters:[25] },
+        { name:"Hébreux", chapters:[14,18,19,16,14,20,28,13,28,39,40,29,25] },
+        { name:"Jacques", chapters:[27,26,18,17,20] },
+        { name:"1 Pierre", chapters:[25,25,22,19,14] },
+        { name:"2 Pierre", chapters:[21,22,18] },
+        { name:"1 Jean", chapters:[10,29,24,21,21] },
+        { name:"2 Jean", chapters:[13] },
+        { name:"3 Jean", chapters:[14] },
+        { name:"Jude", chapters:[25] },
+        { name:"Apocalypse", chapters:[20,29,22,11,14,17,17,13,21,11,19,17,18,20,8,21,18,24,21,15,27,21] }
+    ];
 
     window.updateWordCount = function() {
         const text = document.getElementById('content').value.trim();
@@ -923,170 +988,117 @@
     document.getElementById('bibleVerseRef').textContent = '— ' + todayVerse.ref;
     document.getElementById('bibleVerseDay').textContent = '✦ Parole du ' + new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
 
-    let sharedVersesCol;
-    let allSharedVerses = [];
-    let pendingVerseData = null;
+    /* ═══════════════ ONGLET LETTRE / VERSET ═══════════════ */
+    window.switchPanelTab = function(tab) {
+        document.getElementById('tabBtnLetter').classList.toggle('active', tab === 'letter');
+        document.getElementById('tabBtnVerse').classList.toggle('active', tab === 'verse');
+        document.getElementById('paneLetter').classList.toggle('active', tab === 'letter');
+        document.getElementById('paneVerse').classList.toggle('active', tab === 'verse');
+    };
 
-    try { sharedVersesCol = collection(db, "sharedVerses"); } catch(_) {}
-
-    window.searchAndPreview = async function() {
-        const q = document.getElementById('bibleSearchQuery').value.trim();
-        if (!q) return;
-        const btn = document.getElementById('bibleSearchBtn');
-        btn.disabled = true; btn.textContent = '⏳';
-        const preview = document.getElementById('versePreview');
-        preview.style.display = 'none';
-        pendingVerseData = null;
-
-        const normalized = q.trim();
-
-        const frToEn = {
-            'genese':'genesis','genèse':'genesis','exode':'exodus','levitique':'leviticus','lévitique':'leviticus',
-            'nombres':'numbers','deuteronome':'deuteronomy','deutéronome':'deuteronomy','josue':'joshua','josué':'joshua',
-            'juges':'judges','ruth':'ruth','1 samuel':'1samuel','2 samuel':'2samuel','1 rois':'1kings','2 rois':'2kings',
-            '1 chroniques':'1chronicles','2 chroniques':'2chronicles','esdras':'ezra','nehemie':'nehemiah','néhémie':'nehemiah',
-            'esther':'esther','job':'job','psaumes':'psalms','psaume':'psalms','proverbes':'proverbs','ecclesiaste':'ecclesiastes',
-            'ecclésiaste':'ecclesiastes','cantique':'songofsolomon','esaie':'isaiah','ésaïe':'isaiah','jeremie':'jeremiah',
-            'jérémie':'jeremiah','lamentations':'lamentations','ezechiel':'ezekiel','ézéchiel':'ezekiel','daniel':'daniel',
-            'osee':'hosea','osée':'hosea','joel':'joel','joël':'joel','amos':'amos','abdias':'obadiah','jonas':'jonah',
-            'michee':'micah','michée':'micah','nahoum':'nahum','habacuc':'habakkuk','sophonie':'zephaniah','aggee':'haggai',
-            'aggée':'haggai','zacharie':'zechariah','malachie':'malachi','matthieu':'matthew','marc':'mark','luc':'luke',
-            'jean':'john','actes':'acts','romains':'romans','1 corinthiens':'1corinthians','2 corinthiens':'2corinthians',
-            'galates':'galatians','ephesiens':'ephesians','éphésiens':'ephesians','philippiens':'philippians','colossiens':'colossians',
-            '1 thessaloniciens':'1thessalonians','2 thessaloniciens':'2thessalonians','1 timothee':'1timothy','1 timothée':'1timothy',
-            '2 timothee':'2timothy','2 timothée':'2timothy','tite':'titus','philemon':'philemon','philémon':'philemon',
-            'hebreux':'hebrews','hébreux':'hebrews','jacques':'james','1 pierre':'1peter','2 pierre':'2peter',
-            '1 jean':'1john','2 jean':'2john','3 jean':'3john','jude':'jude','apocalypse':'revelation'
-        };
-
-        function translateRef(ref) {
-            const lower = ref.toLowerCase().trim();
-            for (const [fr, en] of Object.entries(frToEn)) {
-                if (lower.startsWith(fr)) {
-                    return en + ref.slice(fr.length);
-                }
-            }
-            return ref;
+    /* ═══════════════ SÉLECTEURS AUTEUR / CHAPITRE / VERSET ═══════════════ */
+    function populateVerseAuthorSelect() {
+        const sel = document.getElementById('verseAuthorSelect');
+        sel.innerHTML = BIBLE_STRUCTURE.map((b, i) => `<option value="${i}">${b.name}</option>`).join('');
+    }
+    window.onVerseAuthorChange = function() {
+        const bookIdx = +document.getElementById('verseAuthorSelect').value;
+        const book = BIBLE_STRUCTURE[bookIdx];
+        const chapSel = document.getElementById('verseChapterSelect');
+        chapSel.innerHTML = book.chapters.map((_, i) => `<option value="${i}">${i + 1}</option>`).join('');
+        onVerseChapterChange();
+    };
+    window.onVerseChapterChange = function() {
+        const bookIdx = +document.getElementById('verseAuthorSelect').value;
+        const chapIdx = +document.getElementById('verseChapterSelect').value;
+        const nbVerses = BIBLE_STRUCTURE[bookIdx].chapters[chapIdx];
+        const opts = Array.from({length: nbVerses}, (_, i) => `<option value="${i+1}">${i+1}</option>`).join('');
+        document.getElementById('verseStartSelect').innerHTML = opts;
+        document.getElementById('verseEndSelect').innerHTML = opts;
+        updateVerseRefPreview();
+    };
+    window.toggleVerseRange = function() {
+        const checked = document.getElementById('verseRangeToggle').checked;
+        document.getElementById('verseRangeRow').style.display = checked ? 'flex' : 'none';
+        updateVerseRefPreview();
+    };
+    window.updateVerseRefPreview = function() {
+        const bookIdx = +document.getElementById('verseAuthorSelect').value;
+        const book = BIBLE_STRUCTURE[bookIdx];
+        const chapIdx = +document.getElementById('verseChapterSelect').value;
+        const vStart = +document.getElementById('verseStartSelect').value;
+        const isRange = document.getElementById('verseRangeToggle').checked;
+        let ref;
+        if (isRange) {
+            let vEnd = +document.getElementById('verseEndSelect').value;
+            if (vEnd < vStart) vEnd = vStart;
+            ref = vEnd > vStart ? `${book.name} ${chapIdx+1}:${vStart}-${vEnd}` : `${book.name} ${chapIdx+1}:${vStart}`;
+        } else {
+            ref = `${book.name} ${chapIdx+1}:${vStart}`;
         }
+        document.getElementById('verseRefPreview').textContent = ref;
+        return ref;
+    };
+    populateVerseAuthorSelect();
+    window.onVerseAuthorChange();
 
-        try {
-            const enRef = translateRef(normalized);
-            const apiUrl = `https://bible-api.com/${encodeURIComponent(enRef)}?translation=lsg`;
-            const response = await fetch(apiUrl);
-            
-            if (!response.ok) throw new Error("Verset introuvable");
-            const data = await response.json();
-            
-            if (data && data.text) {
-                pendingVerseData = { text: data.text.trim(), ref: data.reference || normalized };
-                document.getElementById('previewText').textContent = data.text.trim();
-                document.getElementById('previewRef').textContent = '— ' + (data.reference || normalized);
-                document.getElementById('verseComment').value = '';
-                preview.style.display = 'block';
-            } else {
-                throw new Error("Erreur de format");
-            }
-        } catch(e) {
-            document.getElementById('previewText').textContent = '⚠️ Verset introuvable. Essaie : Jean 3:16 · Psaumes 23:1 · 1 Corinthiens 13:4';
-            document.getElementById('previewRef').textContent = '';
-            preview.style.display = 'block';
-        } finally {
-            btn.disabled = false; btn.textContent = 'Chercher';
-        }
+    window.resetVerseForm = function() {
+        editingVerseId = null;
+        document.getElementById('verseTextInput').value = '';
+        document.getElementById('verseFeelingInput').value = '';
+        document.getElementById('verseRangeToggle').checked = false;
+        toggleVerseRange();
+        document.getElementById('cancelVerseEditBtn').style.display = 'none';
+        document.getElementById('submitVerseBtn').textContent = 'Sceller & envoyer le verset';
     };
 
-    window.shareVerse = async function() {
-        if (!pendingVerseData || !currentUser) return;
-        const comment = document.getElementById('verseComment').value.trim();
-        try {
-            await addDoc(sharedVersesCol, {
-                ref: pendingVerseData.ref,
-                text: pendingVerseData.text,
-                comment,
-                author: currentUser,
-                sharedAt: serverTimestamp(),
-                replies: []
-            });
-            document.getElementById('versePreview').style.display = 'none';
-            document.getElementById('bibleSearchQuery').value = '';
-            pendingVerseData = null;
-        } catch(e) { console.error('Erreur partage verset:', e); }
-    };
+    let editingVerseId = null;
 
-    window.sendVerseReply = async function(verseId) {
-        const input = document.getElementById('reply-' + verseId);
-        if (!input) return;
-        const text = input.value.trim();
-        if (!text) return;
-        const verse = allSharedVerses.find(v => v.id === verseId);
-        if (!verse) return;
-        const replies = [...(verse.replies || []), { author: currentUser, text, at: Date.now() }];
-        try {
-            await updateDoc(doc(sharedVersesCol, verseId), { replies });
-            input.value = '';
-        } catch(e) { console.error(e); }
-    };
-
-    window.deleteSharedVerse = async function(verseId) {
-        if (!confirm('Supprimer ce verset partagé ?')) return;
-        try { await deleteDoc(doc(sharedVersesCol, verseId)); } catch(e) {}
-    };
-
-    window.toggleReplyForm = function(verseId) {
-        const form = document.getElementById('replyForm-' + verseId);
-        if (form) form.style.display = form.style.display === 'none' ? 'flex' : 'none';
-    };
-
-    function renderSharedVerses(verses) {
-        allSharedVerses = verses;
-        const list = document.getElementById('sharedVersesList');
-        if (!verses.length) {
-            list.innerHTML = '<div class="verses-empty">Aucun verset partagé encore…<br>Cherche un verset ci-dessus et partage-le !</div>';
+    window.saveVerseLetter = async function() {
+        const ref = updateVerseRefPreview();
+        const verseText = document.getElementById('verseTextInput').value.trim();
+        const feeling = document.getElementById('verseFeelingInput').value.trim();
+        if (!verseText) {
+            const msg = document.getElementById('statusMsg');
+            msg.className = 'error'; msg.style.display = 'block';
+            msg.textContent = 'Écris le texte du verset avant d\'envoyer.';
+            setTimeout(() => { msg.style.display = 'none'; }, 3500);
             return;
         }
-        list.innerHTML = '';
-        verses.forEach(v => {
-            const isAuthor = v.author === currentUser;
-            const isIzan = v.author === 'Izan';
-            const date = v.sharedAt ? v.sharedAt.toDate().toLocaleDateString('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : '';
-            const replies = v.replies || [];
-            const repliesHtml = replies.map(r => `
-                <div class="svi-reply-msg">
-                    <strong>${r.author} · </strong>${r.text}
-                </div>`).join('');
 
-            const item = document.createElement('div');
-            item.className = 'shared-verse-item';
-            item.innerHTML = `
-                <div class="svi-header">
-                    <div class="svi-avatar ${isIzan ? 'avatar-izan' : 'avatar-thalia'}">${v.author[0]}</div>
-                    <span class="svi-author">${v.author} a partagé</span>
-                    <span class="svi-date">${date}</span>
-                    ${isAuthor ? `<button class="svi-del-btn" onclick="deleteSharedVerse('${v.id}')">🗑️</button>` : ''}
-                </div>
-                <div class="svi-ref">${v.ref}</div>
-                <div class="svi-text">${v.text}</div>
-                ${v.comment ? `<div class="svi-comment">${v.comment}</div>` : ''}
-                <div class="svi-replies" id="replies-${v.id}">${repliesHtml}</div>
-                <div class="svi-actions">
-                    <button class="svi-reply-btn" onclick="toggleReplyForm('${v.id}')">💬 Répondre</button>
-                </div>
-                <div class="svi-reply-form" id="replyForm-${v.id}" style="display:none;">
-                    <div class="svi-reply-row">
-                        <input class="svi-reply-input" id="reply-${v.id}" placeholder="Ta réponse…" onkeypress="if(event.key==='Enter')sendVerseReply('${v.id}')">
-                        <button class="svi-reply-send" onclick="sendVerseReply('${v.id}')">→</button>
-                    </div>
-                </div>`;
-            list.appendChild(item);
-        });
-    }
+        const btn = document.getElementById('submitVerseBtn');
+        btn.disabled = true;
+        btn.textContent = editingVerseId ? 'Sauvegarde…' : 'Envoi en cours…';
 
-    function initSharedVersesListener() {
-        if (!sharedVersesCol) return;
-        onSnapshot(query(sharedVersesCol, orderBy("sharedAt", "desc")), snap => {
-            renderSharedVerses(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-        });
-    }
+        try {
+            if (editingVerseId) {
+                await updateDoc(doc(db, "letters", editingVerseId), {
+                    verseRef: ref, verseText, feeling,
+                    editedAt: serverTimestamp()
+                });
+            } else {
+                await addDoc(lettersCol, {
+                    kind: 'verse',
+                    verseRef: ref, verseText, feeling,
+                    title: ref,
+                    author: currentUser,
+                    createdAt: serverTimestamp(),
+                    readBy: [], readAt: null, reactions: {}
+                });
+            }
+            resetVerseForm();
+            launchConfetti();
+        } catch(e) {
+            console.error('Erreur envoi verset:', e);
+            const msg = document.getElementById('statusMsg');
+            msg.className = 'error'; msg.style.display = 'block';
+            msg.textContent = 'Erreur lors de l\'envoi : ' + (e.message || e.code || e);
+            setTimeout(() => { msg.style.display = 'none'; }, 5000);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = editingVerseId ? 'Sceller & envoyer le verset' : 'Sceller & envoyer le verset';
+        }
+    };
 
     window.selectMotif = function(motif, el) {
         selectedMotif = motif;
@@ -1158,7 +1170,6 @@
         currentUser = user;
         window.checkUser();
         initFirebaseListener();
-        initSharedVersesListener();
     };
     window.logout = function() {
         localStorage.removeItem('letter_user'); currentUser = null; window.checkUser();
@@ -1233,6 +1244,7 @@
         list.innerHTML = '';
         letters.forEach(l => {
             const isIzan = l.author === "Izan";
+            const isVerse = l.kind === 'verse';
             const initiale = l.author ? l.author[0] : '?';
             const dateStr = l.createdAt ? formatDate(l.createdAt) : '';
             const editedStr = l.editedAt ? ` · ✏️ modifié le ${formatDate(l.editedAt)}` : '';
@@ -1241,7 +1253,7 @@
             const recipient = l.author === "Izan" ? "Thalia" : "Izan";
             const isRead = readBy.includes(recipient);
             const motif = l.motif || 'none';
-            const motifEmoji = MOTIF_EMOJI[motif] ? `<span class="motif-badge">${MOTIF_EMOJI[motif]}</span>` : '';
+            const motifEmoji = (!isVerse && MOTIF_EMOJI[motif]) ? `<span class="motif-badge">${MOTIF_EMOJI[motif]}</span>` : '';
 
             const reactions = l.reactions || {};
             const emojiGroups = {};
@@ -1264,9 +1276,16 @@
             const hasPhotos = l.photoCount && l.photoCount > 0;
             const photosIndicator = hasPhotos ? `<span style="font-size:12px;color:var(--ink-soft);margin-left:4px;">📷${l.photoCount}</span>` : '';
 
+            const kindTagHtml = isVerse
+                ? `<span class="kind-tag ${isIzan ? 'kind-verse-izan' : 'kind-verse-thalia'}">Verset</span>`
+                : `<span class="kind-tag kind-letter">Lettre</span>`;
+
+            const titleDisplay = isVerse ? (l.verseRef || l.title) : l.title;
+            const verseRefLine = isVerse ? `<p class="verse-ref-line">📖 ${escHtml(l.verseRef || '')}</p>` : '';
+
             const card = document.createElement('div');
             const isNew = !isAuthor && !isRead && l.createdAt && (Date.now() - (l.createdAt.toDate ? l.createdAt.toDate() : new Date(l.createdAt)).getTime() < 3600000);
-            card.className = 'letter-card' + (isNew ? ' is-new' : '');
+            card.className = 'letter-card' + (isNew ? ' is-new' : '') + (isVerse ? ' kind-verse ' + (isIzan ? 'author-izan' : 'author-thalia') : '');
             card.innerHTML = `
                 <div class="letter-card-accent ${isIzan ? 'accent-izan' : 'accent-thalia'}"></div>
                 <div class="read-status-row">
@@ -1276,8 +1295,12 @@
                 <div class="letter-card-body">
                     <div class="letter-avatar ${isIzan ? 'avatar-izan' : 'avatar-thalia'}">${initiale}</div>
                     <div class="letter-info" onclick="window._openLetter('${l.id}')">
-                        <h3>${escHtml(l.title)}${motifEmoji}${photosIndicator}</h3>
+                        <div class="letter-info-top">
+                            ${kindTagHtml}
+                            <h3>${escHtml(titleDisplay)}${motifEmoji}${photosIndicator}</h3>
+                        </div>
                         <p class="letter-meta">De ${escHtml(l.author)} · ${dateStr}${editedStr}</p>
+                        ${verseRefLine}
                     </div>
                     <div class="card-actions" style="display:${isAuthor?'flex':'none'};">
                         <button class="icon-btn" title="Modifier" onclick="window._startEdit('${l.id}',event)">✏️</button>
@@ -1352,6 +1375,7 @@
             } else {
                 submitBtn.textContent = 'Création de la lettre…';
                 const docRef = await addDoc(lettersCol, {
+                    kind: 'letter',
                     title, text, motif: selectedMotif,
                     hasPhotos: photoDataUrls.length > 0,
                     photoCount: photoDataUrls.length,
@@ -1382,6 +1406,20 @@
         event.stopPropagation();
         const l = allLetters.find(x => x.id === id);
         if (!l || l.author !== currentUser) return;
+
+        if (l.kind === 'verse') {
+            window.switchPanelTab('verse');
+            editingVerseId = l.id;
+            document.getElementById('verseTextInput').value = l.verseText || '';
+            document.getElementById('verseFeelingInput').value = l.feeling || '';
+            document.getElementById('verseRefPreview').textContent = l.verseRef || '';
+            document.getElementById('cancelVerseEditBtn').style.display = 'block';
+            document.getElementById('submitVerseBtn').textContent = 'Mettre à jour le verset';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+
+        window.switchPanelTab('letter');
         editingId = l.id;
         document.getElementById('title').value = l.title;
         document.getElementById('content').value = l.text;
@@ -1416,6 +1454,7 @@
         if (confirm('Effacer définitivement cette lettre ?')) {
             await deleteDoc(doc(db, "letters", id));
             if (editingId === id) resetForm();
+            if (editingVerseId === id) resetVerseForm();
         }
     };
 
@@ -1429,28 +1468,42 @@
             try { await updateDoc(doc(db, "letters", id), { readBy, readAt: serverTimestamp() }); } catch(e) {}
         }
 
+        const isVerse = activeLetter.kind === 'verse';
         const motif = activeLetter.motif || 'none';
         const sheet = document.getElementById('fullSheet');
-        sheet.className = `a4-sheet motif-${motif}`;
+        sheet.className = `a4-sheet motif-${isVerse ? 'none' : motif}`;
 
         document.getElementById('sheetMeta').innerHTML = 
-            `Écrit par <strong>${activeLetter.author}</strong> · ${formatDate(activeLetter.createdAt)}`
+            `${isVerse ? 'Verset partagé' : 'Lettre'} par <strong>${activeLetter.author}</strong> · ${formatDate(activeLetter.createdAt)}`
             + (activeLetter.editedAt ? `<span style="margin-left:12px;opacity:0.7;font-size:11px;">✏️ Modifié le ${formatDate(activeLetter.editedAt)}</span>` : '');
-        document.getElementById('sheetTitle').textContent = activeLetter.title;
-        document.getElementById('sheetContent').textContent = activeLetter.text;
+
+        const verseBlock = document.getElementById('sheetVerseBlock');
+        if (isVerse) {
+            document.getElementById('sheetTitle').textContent = activeLetter.verseRef || '';
+            verseBlock.style.display = 'block';
+            document.getElementById('sheetVerseRef').textContent = activeLetter.verseRef || '';
+            document.getElementById('sheetVerseText').textContent = activeLetter.verseText || '';
+            document.getElementById('sheetContent').textContent = activeLetter.feeling || '';
+        } else {
+            document.getElementById('sheetTitle').textContent = activeLetter.title;
+            verseBlock.style.display = 'none';
+            document.getElementById('sheetContent').textContent = activeLetter.text;
+        }
         document.getElementById('sheetFooter').textContent = `— ${activeLetter.author} ✦`;
 
         const photosEl = document.getElementById('sheetPhotos');
         photosEl.innerHTML = '';
         
-        const fetchedPhotos = await loadPhotos(id);
-        if (fetchedPhotos && fetchedPhotos.length > 0) {
-            fetchedPhotos.forEach(dataUrl => {
-                const div = document.createElement('div');
-                div.className = 'sheet-photo';
-                div.innerHTML = `<img src="${dataUrl}" alt="photo">`;
-                photosEl.appendChild(div);
-            });
+        if (!isVerse) {
+            const fetchedPhotos = await loadPhotos(id);
+            if (fetchedPhotos && fetchedPhotos.length > 0) {
+                fetchedPhotos.forEach(dataUrl => {
+                    const div = document.createElement('div');
+                    div.className = 'sheet-photo';
+                    div.innerHTML = `<img src="${dataUrl}" alt="photo">`;
+                    photosEl.appendChild(div);
+                });
+            }
         }
 
         document.getElementById('readerView').style.display = 'block';
@@ -1477,7 +1530,8 @@
                     if (!isInitialLoad && letters.length > allLetters.length) {
                         const newest = letters[0];
                         if (newest.author !== currentUser) {
-                            sendNotification(`💌 Nouveau mot de ${newest.author}`, newest.title);
+                            const label = newest.kind === 'verse' ? '📖 Nouveau verset de' : '💌 Nouveau mot de';
+                            sendNotification(`${label} ${newest.author}`, newest.kind === 'verse' ? (newest.verseRef || '') : newest.title);
                         }
                     }
                     isInitialLoad = false;
@@ -1498,7 +1552,7 @@
     }
 
     window.checkUser();
-    if (currentUser) { initFirebaseListener(); initSharedVersesListener(); }
+    if (currentUser) { initFirebaseListener(); }
 </script>
 </body>
 </html>
